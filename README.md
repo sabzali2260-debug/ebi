@@ -1,5 +1,23 @@
-# Do Nafar Cinema
+# سینمای دونفره (Do Nafar Cinema)
 
-Persian RTL two-person watch-party app built with React, Vite, Express, Socket.IO, and Docker.
+اپلیکیشن فارسی راست‌به‌چپ برای تماشای دونفره با اتاق خصوصی، پخش همگام، چت و تماس صوتی.
 
-The deployable application source is bundled in `source.zip.b64` and expanded by the root Dockerfile during Render's Docker build. See the project documentation in the bundle.
+## انتشار
+این مخزن برای Render آماده شده است. Render از Dockerfile ریشه استفاده می‌کند. آرشیو سورس اصلی در `source-parts/` به‌صورت بخش‌های متنی Base64 نگهداری شده و Dockerfile آن را در مرحله ساخت بازیابی می‌کند.
+
+## امکانات
+- اتاق دو نفره با نقش میزبان و مهمان
+- پخش لینک مستقیم ویدئو و HLS با hls.js
+- آپلود فایل ویدئو از رایانه میزبان و پخش آن برای مهمان
+- همگام‌سازی play/pause/seek
+- چت، درخواست کنترل مهمان و تماس صوتی WebRTC
+
+## محدودیت‌ها
+- لینک صفحه‌های DRM یا محتواهای نیازمند ورود/کوکی تضمین‌شده نیست؛ لینک مستقیم MP4/WebM یا HLS مناسب‌تر است و CORS منبع باید پخش را مجاز کند.
+- آپلود فایل به دیسک سرویس انجام می‌شود. تا پیش از افزودن Persistent Disk، فایل‌ها ممکن است با restart یا deploy از بین بروند.
+- کیفیت‌های قابل انتخاب وابسته به renditionهای ارائه‌شده از منبع است؛ این برنامه transcoding انجام نمی‌دهد.
+- برای عبور از برخی NATها تماس صوتی ممکن است به TURN server نیاز داشته باشد.
+- وابستگی‌ها باید در CI/Render نصب و build شوند؛ تست end-to-end چندمرورگری و شبکه‌ای در این محیط اجرا نشده است.
+
+## بررسی سلامت
+مسیر `/api/health` باید `{"ok":true,"service":"do-nafar-cinema"}` برگرداند.
