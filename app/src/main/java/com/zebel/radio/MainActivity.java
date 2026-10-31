@@ -56,7 +56,7 @@ public final class MainActivity extends Activity {
         s.setDisplayZoomControls(false);
         s.setAllowFileAccess(false);
         s.setAllowContentAccess(true);
-        s.setUserAgentString(s.getUserAgentString() + " ZEBELRadio/1.1");
+        s.setUserAgentString(s.getUserAgentString() + " ZEBELRadio/1.3");
         if (Build.VERSION.SDK_INT >= 21) {
             s.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         }

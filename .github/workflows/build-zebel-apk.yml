@@ -29,11 +29,14 @@ jobs:
           gradle-version: '8.13'
       - name: Build debug APK
         run: gradle --no-daemon --stacktrace :app:assembleDebug
-      - name: Verify installable APK
+      - name: Verify APK and package identity
         run: |
-          test -s app/build/outputs/apk/debug/app-debug.apk
-          file app/build/outputs/apk/debug/app-debug.apk
-          unzip -t app/build/outputs/apk/debug/app-debug.apk
+          APK=app/build/outputs/apk/debug/app-debug.apk
+          test -s "$APK"
+          file "$APK"
+          unzip -t "$APK"
+          aapt dump badging "$APK" | grep -F "package: name='com.zebel.radio.v13' versionCode='1' versionName='1.3.0'"
+          apksigner verify --verbose "$APK"
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
