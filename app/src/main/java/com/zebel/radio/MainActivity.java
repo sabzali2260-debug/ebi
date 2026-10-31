@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.webkit.JavascriptInterface;
-import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
@@ -31,7 +30,7 @@ public final class MainActivity extends Activity {
     private static final int REQUEST_NOTIFICATIONS = 4108;
     private static final int REQUEST_BACKGROUND_IMAGE = 4109;
     private WebView webView;
-    private ValueCallback<Uri[]> backgroundFileCallback;
+    private android.webkit.ValueCallback<Uri[]> backgroundFileCallback;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,7 +64,7 @@ public final class MainActivity extends Activity {
         webView.addJavascriptInterface(new ZebelBridge(), "ZebelNative");
         webView.setWebChromeClient(new WebChromeClient() {
             @Override public boolean onShowFileChooser(
-                    WebView view, ValueCallback<Uri[]> callback, FileChooserParams params) {
+                    WebView view, android.webkit.ValueCallback<Uri[]> callback, FileChooserParams params) {
                 if (backgroundFileCallback != null) {
                     backgroundFileCallback.onReceiveValue(null);
                 }
@@ -75,7 +74,9 @@ public final class MainActivity extends Activity {
                     pick.addCategory(Intent.CATEGORY_OPENABLE);
                     pick.setType("image/*");
                     pick.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    startActivityForResult(Intent.createChooser(pick, "انتخاب تصویر پس‌زمینه"), REQUEST_BACKGROUND_IMAGE);
+                    startActivityForResult(
+                            Intent.createChooser(pick, "انتخاب تصویر پس‌زمینه"),
+                            REQUEST_BACKGROUND_IMAGE);
                     return true;
                 } catch (Exception e) {
                     backgroundFileCallback = null;

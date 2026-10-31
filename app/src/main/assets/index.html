@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="android-native-app" lang="fa" dir="rtl" data-accent="amber" data-build="radio-world-pro-2026.10">
+<html class="android-native-app" lang="fa" dir="rtl" data-accent="amber" data-build="zebel-radio-1.1.0">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -656,32 +656,117 @@ body{background:radial-gradient(ellipse at 50% -12%,#29313b 0,#11161c 36%,#07090
 }
 
 
-/* Android-only full-screen phone layout */
-@media(max-width:820px){
-html.android-native-app,html.android-native-app body{width:100%;min-height:100%;margin:0;overflow-x:hidden;background:#07090c;overscroll-behavior-x:none;-webkit-tap-highlight-color:transparent}
-html.android-native-app body{padding:0}
-html.android-native-app .app{width:100%;max-width:none!important;margin:0!important;padding:0 0 calc(22px + env(safe-area-inset-bottom))!important}
-html.android-native-app .top{display:none!important}
-html.android-native-app .radio-console{width:100%;max-width:none!important;margin:0 0 14px!important;border-radius:0 0 22px 22px!important;border-left:0;border-right:0}
-html.android-native-app .console-top{height:58px!important;min-height:58px;padding:0 16px!important;justify-content:center;gap:12px}
-html.android-native-app .console-top strong{font-size:clamp(21px,6vw,27px)!important}
-html.android-native-app .console-main{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;grid-template-rows:auto auto!important;gap:10px!important;padding:12px 9px 10px!important;align-items:stretch!important}
-html.android-native-app .screen-assembly{grid-column:1/-1!important;grid-row:1!important;min-width:0}
-html.android-native-app .console-side.left{grid-column:1!important;grid-row:2!important}
-html.android-native-app .console-side.right{grid-column:2!important;grid-row:2!important}
-html.android-native-app .orange-screen{min-height:clamp(310px,48dvh,440px)!important;padding:clamp(12px,3.3vw,18px)!important}
-html.android-native-app #homeViz{height:clamp(128px,20dvh,190px)!important}
-html.android-native-app .screen-controls{height:58px!important}
-html.android-native-app .console-side{min-height:0!important;padding:9px 4px!important}
-html.android-native-app .console-side .knob{width:clamp(68px,19vw,84px)!important}
-html.android-native-app .amp-mini{max-width:100%!important}
-html.android-native-app .console-bottom{display:flex!important;padding:10px 10px calc(12px + env(safe-area-inset-bottom))!important;gap:7px!important}
-html.android-native-app .console-bottom button{min-height:48px!important;font-size:17px!important}
-html.android-native-app .tabs{position:sticky;top:0;z-index:18}
-html.android-native-app .list{grid-template-columns:minmax(0,1fr)!important;gap:7px!important}
-html.android-native-app .row{min-height:62px}
+/* ZEBEL RADIO 1.1 — full-screen phone edition and performance pass */
+:root { --radio-wallpaper: radial-gradient(110% 70% at 50% 0%,#222b35 0%,#10151b 48%,#07090c 100%); }
+body { background:transparent; }
+body::before { content:""; position:fixed; inset:0; z-index:-1; pointer-events:none; background-image:linear-gradient(180deg,rgba(4,7,12,.42),rgba(4,7,12,.76)),var(--radio-wallpaper); background-size:cover; background-position:center; }
+html[data-wallpaper="carbon"] { --radio-wallpaper:repeating-linear-gradient(135deg,#171c21 0 2px,#101418 2px 5px),radial-gradient(circle at 50% 0%,#27313b,#080a0d 76%); }
+html[data-wallpaper="midnight"] { --radio-wallpaper:radial-gradient(120% 80% at 50% 0%,#1a3964,#111c37 42%,#070b18 100%); }
+html[data-wallpaper="forest"] { --radio-wallpaper:radial-gradient(100% 80% at 50% 0%,#1d4a3c,#11251f 48%,#070d0b 100%); }
+html[data-wallpaper="wine"] { --radio-wallpaper:radial-gradient(110% 75% at 50% 0%,#562435,#29131f 48%,#09070a 100%); }
+html[data-wallpaper="violet"] { --radio-wallpaper:radial-gradient(110% 75% at 50% 0%,#44336b,#211a3b 50%,#090811 100%); }
+html[data-wallpaper="steel"] { --radio-wallpaper:radial-gradient(110% 75% at 50% 0%,#48535d,#202832 48%,#080b10 100%); }
+html[data-wallpaper="custom"] body::before { background-image:linear-gradient(180deg,rgba(4,7,12,.58),rgba(4,7,12,.82)),var(--custom-radio-wallpaper,linear-gradient(#18212c,#080a0d)); }
+.display-time-pack { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; line-height:1.05; min-width:76px; font-variant-numeric:tabular-nums; }
+#screenDate { font:800 9px/1.1 'Arial',sans-serif; letter-spacing:1.05px; opacity:.78; white-space:nowrap; }
+#screenClock { font:900 15px/1.1 'Arial',sans-serif; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.display-head { align-items:center; }
+.marquee-window { border:1px solid rgba(20,14,8,.36); border-radius:7px; background:linear-gradient(180deg,rgba(0,0,0,.23),rgba(255,255,255,.07)); box-shadow:inset 0 3px 10px rgba(0,0,0,.24),0 1px 0 rgba(255,255,255,.13); }
+.marquee-track span { font-family:system-ui,'Segoe UI',Tahoma,Arial,sans-serif!important; font-weight:900!important; letter-spacing:.35px!important; font-size:clamp(18px,5vw,27px)!important; }
+.station-panel { margin:10px 0 18px; border:1px solid #323b46; border-radius:19px; padding:10px; background:linear-gradient(150deg,rgba(24,31,39,.94),rgba(8,11,15,.96)); box-shadow:0 16px 36px rgba(0,0,0,.35); }
+.station-panel-head { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:4px 4px 12px; color:#f6b25d; }
+.station-panel-head div { display:flex; flex-direction:column; gap:3px; min-width:0; }
+.station-panel-head strong { font:900 12px/1.2 Arial,sans-serif; letter-spacing:1.35px; }
+.station-panel-head small { color:#aeb8c4; font-size:11px; }
+.station-refresh { min-height:38px; border:1px solid #596575; border-radius:11px; padding:0 12px; background:linear-gradient(#343e49,#171e26); color:#ffd08b; font-weight:800; }
+.station-refresh:disabled { opacity:.5; }
+.station-refresh span { font:800 10px Arial,sans-serif; letter-spacing:.8px; }
+.station-panel[hidden] { display:none!important; }
+.wallpaper-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin:10px 0; }
+.wallpaper-grid button { border:1px solid var(--line); border-radius:12px; padding:6px; background:var(--surface2); color:var(--text); display:flex; flex-direction:column; gap:5px; align-items:stretch; font:800 9px Arial,sans-serif; letter-spacing:.7px; }
+.wallpaper-grid button[aria-pressed="true"] { border-color:var(--accent); box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 28%,transparent); }
+.wallpaper-grid .wall { height:38px; border-radius:7px; display:block; }
+.wall.carbon { background:repeating-linear-gradient(135deg,#303a43 0 2px,#10151a 2px 5px); }
+.wall.midnight { background:linear-gradient(135deg,#244e80,#070d20); }
+.wall.forest { background:linear-gradient(135deg,#2b6a52,#08130f); }
+.wall.wine { background:linear-gradient(135deg,#87405b,#160b12); }
+.wall.violet { background:linear-gradient(135deg,#7b5eae,#17102c); }
+.wall.steel { background:linear-gradient(135deg,#9da9b3,#26313d); }
+.wallpaper-upload { display:block; text-align:center; border:1px dashed var(--accent); color:var(--text); border-radius:12px; padding:12px; margin:8px 0; cursor:pointer; font-weight:800; }
+
+@media(max-width:820px) {
+  html.android-native-app,html.android-native-app body { width:100%; height:100%; min-height:100%; margin:0; overflow-x:hidden; background:transparent; overscroll-behavior-x:none; -webkit-tap-highlight-color:transparent; }
+  html.android-native-app body { padding:0; }
+  html.android-native-app .app { width:100%; max-width:none!important; margin:0!important; padding:0 0 calc(10px + env(safe-area-inset-bottom))!important; }
+  html.android-native-app .top { display:none!important; }
+  html.android-native-app .radio-console { width:100%; max-width:none!important; margin:0!important; border-radius:0 0 22px 22px!important; border-left:0; border-right:0; }
+  html.android-native-app .console-top { height:48px!important; min-height:48px; padding:0 12px!important; justify-content:center; gap:9px; }
+  html.android-native-app .console-top strong { font-size:clamp(19px,5.4vw,24px)!important; }
+  html.android-native-app .console-top .brand-logo-frame { width:31px!important; height:31px!important; }
+  html.android-native-app .console-top .console-icon { width:34px!important; height:38px!important; font-size:23px!important; }
+  html.android-native-app .console-main { display:grid!important; grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important; grid-template-rows:auto auto!important; gap:8px!important; padding:8px 7px 7px!important; align-items:stretch!important; }
+  html.android-native-app .screen-assembly { grid-column:1/-1!important; grid-row:1!important; min-width:0; }
+  html.android-native-app .screen-assembly { display:block!important; position:relative!important; width:100%!important; }
+  html.android-native-app .screen-assembly>.screen-wrap { width:100%!important; min-width:0!important; }
+  html.android-native-app .screen-color-switch { position:absolute!important; top:7px!important; right:7px!important; left:auto!important; width:34px!important; min-height:38px!important; height:38px!important; padding:3px!important; gap:1px!important; z-index:6!important; transform:none!important; border-radius:9px!important; }
+  html.android-native-app .screen-color-label { display:none!important; }
+  html.android-native-app .screen-color-switch small { font-size:6px!important; }
+  html.android-native-app .display-live { margin-right:38px!important; }
+  html.android-native-app .marquee-window { margin-right:0!important; }
+  html.android-native-app .console-side.left { grid-column:1!important; grid-row:2!important; }
+  html.android-native-app .console-side.right { grid-column:2!important; grid-row:2!important; }
+  html.android-native-app .screen-wrap { padding:6px!important; border-radius:20px!important; }
+  html.android-native-app .orange-screen { height:clamp(320px,47svh,455px)!important; min-height:0!important; padding:10px 11px 8px!important; border-radius:14px!important; }
+  html.android-native-app .display-head { gap:5px!important; min-height:23px; }
+  html.android-native-app .display-brand { font-size:clamp(8px,2.2vw,10px)!important; letter-spacing:.65px!important; }
+  html.android-native-app #screenDate { font-size:8px!important; letter-spacing:.5px!important; }
+  html.android-native-app #screenClock { font-size:12px!important; }
+  html.android-native-app .display-live { font-size:9px!important; white-space:nowrap; }
+  html.android-native-app .marquee-window { margin:8px 0 5px!important; height:43px!important; }
+  html.android-native-app .marquee-track span { font-size:clamp(18px,5.4vw,24px)!important; }
+  html.android-native-app .display-meta { font-size:9px!important; }
+  html.android-native-app #homeViz { height:clamp(125px,20svh,180px)!important; margin:3px 0 0!important; }
+  html.android-native-app .display-footer { font-size:8px!important; gap:4px!important; }
+  html.android-native-app .screen-controls { height:49px!important; gap:10px!important; }
+  html.android-native-app .screen-controls button { width:43px!important; min-width:43px!important; height:43px!important; font-size:23px!important; }
+  html.android-native-app .screen-controls .screen-play { width:54px!important; min-width:54px!important; height:54px!important; }
+  html.android-native-app .screen-color-switch { right:5px!important; top:50%!important; transform:translateY(-50%) scale(.82)!important; }
+  html.android-native-app .console-side { min-height:0!important; padding:5px 4px!important; gap:5px!important; }
+  html.android-native-app .console-side .knob { width:clamp(63px,17vw,76px)!important; border-width:6px!important; }
+  html.android-native-app .side-label { font-size:11px!important; }
+  html.android-native-app .knob-readout { font-size:10px!important; }
+  html.android-native-app #homeMute { width:37px!important; height:34px!important; min-height:34px!important; }
+  html.android-native-app .station-strip { margin:5px 8px 7px!important; min-height:57px!important; padding:7px 9px!important; gap:7px!important; border-radius:13px!important; }
+  html.android-native-app .station-strip .tower { font-size:23px!important; padding-right:8px!important; }
+  html.android-native-app .station-cell strong { font-size:clamp(12px,3.4vw,15px)!important; }
+  html.android-native-app .station-cell span { font-size:10px!important; }
+  html.android-native-app .station-cell.tech { flex-basis:70px!important; padding-left:7px!important; }
+  html.android-native-app .signal { height:29px!important; gap:2px!important; padding-left:5px!important; }
+  html.android-native-app .signal i { width:4px!important; }
+  html.android-native-app .amp-mini { margin:0 8px 7px!important; max-width:none!important; padding:6px 9px!important; border-radius:13px!important; }
+  html.android-native-app .amp-mini-heading { margin-bottom:2px!important; font-size:9px!important; }
+  html.android-native-app .amp-control-group { gap:5px!important; }
+  html.android-native-app .amp-knob { width:35px!important; height:35px!important; }
+  html.android-native-app .amp-control label,html.android-native-app .amp-control output { font-size:8px!important; }
+  html.android-native-app .console-bottom { display:flex!important; min-height:47px!important; padding:5px 7px calc(6px + env(safe-area-inset-bottom))!important; gap:6px!important; }
+  html.android-native-app .console-bottom button { min-height:37px!important; font-size:13px!important; border-radius:10px!important; }
+  html.android-native-app #homeNavStations { font-size:11px!important; }
+  html.android-native-app .station-panel { margin:8px 8px 18px!important; }
+  html.android-native-app .tabs { position:sticky; top:0; z-index:18; }
+  html.android-native-app .list { grid-template-columns:minmax(0,1fr)!important; gap:7px!important; }
+  html.android-native-app .row { min-height:62px; }
+  html.android-native-app .station-panel:not(.is-open) { display:none!important; }
+  html.android-native-app .sheet { padding-top:env(safe-area-inset-top); }
+  html.android-native-app .sheet .lcd { width:calc(100vw - 24px)!important; max-width:none!important; }
 }
-@media(max-width:380px){html.android-native-app .console-main{gap:7px!important;padding-inline:7px!important}html.android-native-app .orange-screen{min-height:300px!important}html.android-native-app .screen-controls{gap:18px!important}html.android-native-app .screen-controls #homePrev,html.android-native-app .screen-controls #homeNext{width:38px!important;min-width:38px!important}}
+@media(max-width:380px) {
+  html.android-native-app .orange-screen { height:clamp(300px,45svh,400px)!important; }
+  html.android-native-app #homeViz { height:clamp(116px,18svh,150px)!important; }
+  html.android-native-app .console-main { gap:6px!important; padding-inline:5px!important; }
+  html.android-native-app .screen-controls { gap:6px!important; }
+  html.android-native-app .screen-controls button { width:39px!important; min-width:39px!important; }
+}
+@media(prefers-reduced-motion:reduce){.station-panel,.wallpaper-grid button{transition:none!important}}
 
 </style>
 </head>
@@ -704,7 +789,7 @@ html.android-native-app .row{min-height:62px}
     <div class="console-main">
       <aside class="console-side left"><div class="side-label">VOLUME</div><div class="knob volume-knob" id="volumeKnob" role="slider" tabindex="0" aria-label="تنظیم صدا با چرخش" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"></div><div class="knob-readout" id="volumeReadout">100%</div><button id="homeMute" class="round-control" type="button" aria-label="قطع صدا" aria-pressed="false">◖</button></aside>
       <div class="screen-assembly"><div class="screen-wrap"><div class="orange-screen" data-screen-theme="amber">
-        <div class="display-head"><span class="display-brand">ZEBEL RADIO // DIGITAL RECEIVER</span><time id="screenClock">00:00:00</time><span class="display-live" id="displayLive">● STANDBY</span></div>
+        <div class="display-head"><span class="display-brand">ZEBEL RADIO // DIGITAL RECEIVER</span><span class="display-time-pack"><time id="screenDate">31 OCT 2026</time><time id="screenClock">00:00:00</time></span><span class="display-live" id="displayLive">● STANDBY</span></div>
         <div class="marquee-window" aria-label="نام ایستگاه در حال پخش"><div class="marquee-track" id="marqueeTrack"><span id="homeMarquee">ZEBEL RADIO // SELECT A STATION</span><span id="homeMarqueeCopy" aria-hidden="true">ZEBEL RADIO // SELECT A STATION</span></div></div>
         <div class="display-meta"><span id="displayCountry">GLOBAL BROADCAST</span><span id="displayStatus">SYSTEM READY</span></div>
         <canvas id="homeViz" aria-label="اکولایزر حساس به صدای زنده"></canvas>
@@ -727,10 +812,15 @@ html.android-native-app .row{min-height:62px}
         <div class="amp-control"><button class="amp-knob" id="toneTreble" type="button" role="slider" tabindex="0" aria-label="تریبل" aria-valuemin="-12" aria-valuemax="12" aria-valuenow="0" data-tone-band="4"></button><label for="toneTreble">TREBLE</label><output id="toneTrebleValue">0 dB</output></div>
       </div>
     </div>
-    <div class="console-bottom"><button id="homeNavFav">★</button><button id="homeNavRecent">☷</button><button id="homeNavExplore">◎</button><button id="homeTimer">◔</button><button id="homeNavStations">▦ <span>Stations</span></button></div>
+    <div class="console-bottom"><button id="homeNavFav">★</button><button id="homeNavRecent">☷</button><button id="homeNavExplore">◎</button><button id="homeTimer">◔</button><button id="homeNavStations" type="button" aria-expanded="false" aria-controls="stationPanel">▦ <span>STATIONS</span></button></div>
   </section>
 
-  <div class="tabs" role="tablist">
+  <section class="station-panel" id="stationPanel" aria-hidden="false">
+  <div class="station-panel-head">
+    <div><strong>LIVE STATION DIRECTORY</strong><small id="stationSyncLabel">Station catalogue</small></div>
+    <button type="button" class="station-refresh" id="refreshStations" aria-label="به‌روزرسانی ایستگاه‌ها">↻ <span>UPDATE</span></button>
+  </div>
+<div class="tabs" role="tablist">
     <button class="tab" role="tab" id="tab-explore" aria-selected="true">کشف</button>
     <button class="tab" role="tab" id="tab-recent" aria-selected="false">اخیراً</button>
     <button class="tab" role="tab" id="tab-favs" aria-selected="false">علاقه‌مندی‌ها</button>
@@ -746,6 +836,8 @@ html.android-native-app .row{min-height:62px}
   <div id="stateBox"></div>
 </div>
 
+
+</section>
 <div class="mini" id="mini">
   <button class="mini-open" id="miniOpen" aria-label="باز کردن پلیر">
     <div class="logo" id="miniLogo"></div>
@@ -829,7 +921,22 @@ html.android-native-app .row{min-height:62px}
       </div>
     </div>
 
-    <div class="group" id="g-sound">
+    <div class="group" id="g-background">
+  <h3>پس‌زمینه دستگاه</h3>
+  <p class="hint">پس‌زمینه محیط برنامه را تغییر بده؛ نمایشگر دیجیتال مستقل می‌ماند.</p>
+  <div class="wallpaper-grid" id="wallpaperGrid">
+    <button type="button" data-wallpaper="carbon" aria-label="کربن تیره"><i class="wall carbon"></i><span>CARBON</span></button>
+    <button type="button" data-wallpaper="midnight" aria-label="آبی نیمه‌شب"><i class="wall midnight"></i><span>MIDNIGHT</span></button>
+    <button type="button" data-wallpaper="forest" aria-label="سبز جنگلی"><i class="wall forest"></i><span>FOREST</span></button>
+    <button type="button" data-wallpaper="wine" aria-label="زرشکی"><i class="wall wine"></i><span>WINE</span></button>
+    <button type="button" data-wallpaper="violet" aria-label="بنفش"><i class="wall violet"></i><span>VIOLET</span></button>
+    <button type="button" data-wallpaper="steel" aria-label="استیل"><i class="wall steel"></i><span>STEEL</span></button>
+  </div>
+  <label class="wallpaper-upload" for="backgroundFile">▧ انتخاب تصویر از گوشی</label>
+  <input id="backgroundFile" type="file" accept="image/*" hidden>
+  <button type="button" class="btn-ghost" id="clearBackground">بازنشانی پس‌زمینه</button>
+</div>
+<div class="group" id="g-sound">
       <h3>صدا</h3>
       <label class="switch-row">
         <span>پردازش حرفه‌ای صدا<small>تحلیل طیف زنده به‌صورت خودکار فعال است. با روشن کردن این گزینه، اکولایزر و فشرده‌ساز نیز روی صدا اعمال می‌شوند. اگر ایستگاهی دسترسی تحلیل صوتی را محدود کند، پخش مستقیم ادامه پیدا می‌کند.</small></span>
@@ -837,6 +944,8 @@ html.android-native-app .row{min-height:62px}
       </label>
       <p class="fxstat" id="fxStat" aria-live="polite"></p>
       <div id="fxPanel">
+        <label class="row-range"><span>کیفیت طیف</span><select class="field" id="audioQuality" aria-label="کیفیت و پاسخ اکولایزر"><option value="responsive">پاسخ سریع</option><option value="balanced" selected>متعادل</option><option value="studio">استودیویی</option></select><output id="qualityOut">48 BANDS</output></label>
+        <label class="switch-row" style="margin:8px 0 12px"><span>تقویت هوشمند صدا<small>متعادل‌سازی پویای بلندی و کاهش افت ناگهانی حجم صدا</small></span><input class="switch" id="loudnessOn" role="switch" type="checkbox"></label>
         <select class="field" id="preset" aria-label="پیش‌تنظیم صدا"></select>
         <div id="bands"></div>
         <label class="switch-row" style="margin-top:12px"><span>فشرده‌ساز<small>صدا را یکنواخت‌تر می‌کند.</small></span><input type="checkbox" class="switch" id="compOn" role="switch"></label>
@@ -893,7 +1002,8 @@ const FALLBACK = [
 ].map((a, i) => ({ stationuuid: 'fb-' + i, name: a[0], countrycode: a[1], tags: a[2], url_resolved: a[3], url: a[3], favicon: '', bitrate: 0, codec: '', language: '' }));
 
 const PRESETS = { flat: [0,0,0,0,0], bass: [7,4,0,0,0], vocal: [-2,1,4,3,-1], treble: [-1,0,0,4,7], rock: [5,2,-2,3,5], jazz: [3,2,-2,2,4], classical: [4,2,-1,2,4], loud: [6,3,0,3,5] };
-const PRESET_LABELS = { flat: 'خنثی', bass: 'بیس قوی', vocal: 'صدای خواننده', treble: 'تیز', rock: 'راک', jazz: 'جز', classical: 'کلاسیک', loud: 'لودنس' };
+const PRESET_LABELS = { flat: 'خنثی', bass: 'بیس قوی', vocal: 'صدای خواننده', treble: 'شفاف', rock: 'راک', jazz: 'جز', classical: 'کلاسیک', loud: 'لودنس', electronic: 'الکترونیک', deep: 'بیس عمیق', podcast: 'گفتار و پادکست', acoustic: 'آکوستیک', cinema: 'سینمایی' };
+PRESETS.electronic=[6,3,0,3,6]; PRESETS.deep=[9,5,0,-1,2]; PRESETS.podcast=[-3,0,4,5,2]; PRESETS.acoustic=[2,3,1,3,4]; PRESETS.cinema=[5,1,-1,3,5];
 const BANDS = [{ f: 60, l: '۶۰ هرتز' }, { f: 230, l: '۲۳۰ هرتز' }, { f: 910, l: '۹۱۰ هرتز' }, { f: 3600, l: '۳٫۶ کیلوهرتز' }, { f: 14000, l: '۱۴ کیلوهرتز' }];
 const STATUS_TEXT = { idle: '', playing: 'زنده', paused: 'متوقف', connecting: 'در حال اتصال', reconnecting: 'اتصال دوباره', failed: 'پخش نشد. ایستگاه دیگری را امتحان کن' };
 
@@ -907,7 +1017,7 @@ const state = {
   stations: [], byId: new Map(), favs: new Map(), recent: [], cur: null, tab: 'explore', q: '', cc: '', chip: 'top',
   status: 'idle', retries: 0, token: 0, elapsed: 0, offset: 0, seen: new Set(), hasMore: false, offline: false, errCode: 0, muted: false,
   sleepAt: 0, sleepMin: 0,
-  settings: { theme: 'auto', accent: 'amber', fx: false, preset: 'flat', bands: [0,0,0,0,0], comp: false, pan: 0, volume: 1 }
+  settings: { theme: 'auto', accent: 'amber', wallpaper: 'carbon', customWallpaper: '', quality: 'balanced', loudness: false, fx: false, preset: 'flat', bands: [0,0,0,0,0], comp: false, pan: 0, volume: 1 }
 };
 const fxBad = new Set();
 const reduceMotion = window.matchMedia ? matchMedia('(prefers-reduced-motion: reduce)').matches : false;
@@ -989,13 +1099,28 @@ async function loadStations(more) {
     });
     state.stations = incoming;
     state.offline = false;
+    if (state.cur) {
+      const latest = state.byId.get(state.cur.stationuuid);
+      if (latest) {
+        const oldUrl = state.cur.url_resolved || state.cur.url;
+        const newUrl = latest.url_resolved || latest.url;
+        state.cur = latest;
+        if (oldUrl && newUrl && oldUrl !== newUrl && isBusy()) { state.retries = 0; state.token++; startStream(); }
+        syncPlayer();
+      }
+    }
     render();
+    kv.set('radio:stationCache', { savedAt: Date.now(), stations: incoming.slice(0, 160) });
+    kv.set('radio:stationSyncAt', Date.now());
+    const sl=$('#stationSyncLabel'); if(sl) sl.textContent='Updated '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
   } catch (e) {
     if (seq !== loadSeq) return;
     if (more) { state.offset -= PAGE; toast('بارگذاری بیشتر ممکن نشد'); return; }
     state.offline = true; state.hasMore = false;
-    state.stations = fallbackStations();
-    state.stations.forEach(s => state.byId.set(s.stationuuid, s));
+    // Keep the most recent successful catalogue when the network is temporarily unavailable.
+    if (!state.stations.length) state.stations = fallbackStations();
+    state.stations.forEach(st => state.byId.set(st.stationuuid, st));
+    const sl=$('#stationSyncLabel'); if(sl) sl.textContent='CACHED CATALOGUE • OFFLINE';
     render();
   }
 }
@@ -1144,7 +1269,8 @@ function ensureFx() {
     const makeup = ctx.createGain();
     const pan = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
     const analyser = ctx.createAnalyser();
-    analyser.fftSize = 2048; analyser.smoothingTimeConstant = 0.68; analyser.minDecibels = -92; analyser.maxDecibels = -18;
+    const analyserProfile={responsive:[1024,.42],balanced:[2048,.54],studio:[4096,.62]}[state.settings.quality||'balanced']||[2048,.54];
+    analyser.fftSize = analyserProfile[0]; analyser.smoothingTimeConstant = analyserProfile[1]; analyser.minDecibels = -88; analyser.maxDecibels = -16;
     const master = ctx.createGain();
     let node = src;
     [...eq, comp, makeup, ...(pan ? [pan] : []), analyser, master].forEach(n => { node.connect(n); node = n; });
@@ -1158,7 +1284,10 @@ function applySound() {
   if (!graph) return;
   const s = state.settings, t = ctx.currentTime;
   graph.eq.forEach((n, i) => n.gain.setTargetAtTime(s.bands[i], t, 0.02));
-  if (s.comp) {
+  if (s.loudness) {
+    graph.comp.threshold.value = -32; graph.comp.knee.value = 30; graph.comp.ratio.value = s.comp ? 4.5 : 2.6;
+    graph.comp.attack.value = 0.012; graph.comp.release.value = 0.28; graph.makeup.gain.value = s.comp ? 1.45 : 1.2;
+  } else if (s.comp) {
     graph.comp.threshold.value = -26; graph.comp.knee.value = 24; graph.comp.ratio.value = 5;
     graph.comp.attack.value = 0.005; graph.comp.release.value = 0.2; graph.makeup.gain.value = 1.6;
   } else { graph.comp.threshold.value = 0; graph.comp.ratio.value = 1; graph.makeup.gain.value = 1; }
@@ -1173,6 +1302,7 @@ function applyVolume() {
 const stopEl = a => { try { a.pause(); a.removeAttribute('src'); a.load(); } catch (e) {} };
 
 function playStation(st) {
+  if(document.documentElement.classList.contains('android-native-app') || window.ZebelNative)toggleStationPanel(false);
   state.cur = st; state.retries = 0; state.elapsed = 0; state.token++;
   clearTimers();
   startStream();
@@ -1192,11 +1322,13 @@ function startStream() {
   if (audio !== next) { const old = audio; audio = next; stopEl(old); }
   if (wantFx && ctx.state === 'suspended') ctx.resume().catch(() => {});
   state.status = state.retries ? 'reconnecting' : 'connecting';
-  audio.src = st.url_resolved || st.url;
+  const sources = [...new Set([st.url_resolved, st.url].filter(u => typeof u === 'string' && /^https?:\/\//i.test(u)))];
+  audio.src = sources[Math.min(state.retries, Math.max(0, sources.length - 1))] || st.url_resolved || st.url;
+  audio.load();
   try {
     const playAttempt = audio.play();
     if (playAttempt && typeof playAttempt.catch === 'function') playAttempt.catch(err => {
-      if (err && err.name === 'NotAllowedError') { state.status = 'paused'; syncPlayer(); }
+      if (err && err.name === 'NotAllowedError') { state.status = 'paused'; syncPlayer(); try { window.ZebelNative?.onPlaybackPaused(); } catch (_) {} }
       else if (err) { state.errCode = audio.error ? audio.error.code : 0; scheduleRetry(); }
     });
   } catch (err) { state.status = 'failed'; syncPlayer(); }
@@ -1204,7 +1336,7 @@ function startStream() {
 }
 function scheduleRetry() {
   clearTimers();
-  if (state.retries >= 4) { state.status = 'failed'; syncPlayer(); syncRows(); try { window.ZebelNative?.onPlaybackPaused(); } catch (_) {} return; }
+  if (state.retries >= 4) { state.status = 'failed'; syncPlayer(); syncRows(); updatePlaybackState(); try { window.ZebelNative?.onPlaybackPaused(); } catch (_) {} return; }
   state.retries++;
   state.status = 'reconnecting'; syncPlayer();
   const tk = state.token;
@@ -1215,7 +1347,7 @@ function togglePlay() {
   if (!state.cur) return;
   if (isBusy()) { state.token++; clearTimers(); stopEl(audio); state.status = 'paused'; try { window.ZebelNative?.onPlaybackPaused(); } catch (_) {} }
   else { state.retries = 0; state.token++; startStream(); }
-  syncPlayer(); syncRows();
+  updatePlaybackState(); syncPlayer(); syncRows();
 }
 function step(dir) {
   let list = currentList();
@@ -1262,10 +1394,11 @@ function syncPlayer() {
   $('#homeCountry').textContent = st.countrycode ? flag(st.countrycode) + ' ' + countryName(st.countrycode) : 'کشور نامشخص';
   $('#homeBitrate').textContent = st.bitrate ? st.bitrate + ' kbps' : 'LIVE';
   $('#homeCodec').textContent = (st.codec || 'STREAM').toUpperCase();
-  const ticker = 'NOW TUNING  //  ' + st.name.trim().toUpperCase() + '  //  ZEBEL RADIO  //';
+  const tickerCountry = st.countrycode ? countryName(st.countrycode) : 'INTERNATIONAL';
+  const ticker = 'LIVE STATION  //  ' + st.name.trim() + '  •  ' + tickerCountry + '  //';
   $('#homeMarquee').textContent = ticker;
   $('#homeMarqueeCopy').textContent = ticker;
-  $('#displayCountry').textContent = (st.countrycode ? countryName(st.countrycode) : 'GLOBAL') + '  •  ' + (st.language || 'INTERNATIONAL');
+  $('#displayCountry').textContent = (st.countrycode ? flag(st.countrycode) + ' ' + countryName(st.countrycode) : 'GLOBAL');
   $('#displayStatus').textContent = state.status === 'playing' ? 'LIVE BROADCAST' : statusText.toUpperCase();
   $('#displayLive').textContent = state.status === 'playing' ? '● ON AIR' : '● STANDBY';
   $('#displayLive').classList.toggle('active', state.status === 'playing');
@@ -1322,77 +1455,116 @@ function renderFxStatus() {
   el.textContent = t;
 }
 
-/* ---------- high-resolution live spectrum ---------- */
-const N = 56;
-const viz = { bars:new Array(N).fill(0), peaks:new Array(N).fill(0), t:0, raf:0, data:null, wave:null, vuL:0, vuR:0, lastDraw:0 };
+/* ---------- optimized live spectrum: cached canvas, responsive frame pacing ---------- */
+const N = 48;
 let vizColor = '#FF9B32';
-function frame(now=0) {
-  viz.raf = requestAnimationFrame(frame);
-  const playing = state.status === 'playing';
-  let low = 0, mid = 0, high = 0, rms = 0;
-  const analyserActive = playing && graph && audio === fxAudio && ctx && ctx.state === 'running';
-  if (analyserActive) {
-    if (!viz.data || viz.data.length !== graph.analyser.frequencyBinCount) viz.data = new Uint8Array(graph.analyser.frequencyBinCount);
-    if (!viz.wave || viz.wave.length !== graph.analyser.fftSize) viz.wave = new Uint8Array(graph.analyser.fftSize);
-    graph.analyser.getByteFrequencyData(viz.data);
-    graph.analyser.getByteTimeDomainData(viz.wave);
-    let sq=0; for (let i=0;i<viz.wave.length;i++){ const x=(viz.wave[i]-128)/128; sq+=x*x; }
-    rms=Math.sqrt(sq/viz.wave.length);
-    const maxBin=Math.max(2, viz.data.length-1);
-    const avg=(a,b)=>{let z=0,n=0;for(let k=a;k<Math.min(b,viz.data.length);k++){z+=viz.data[k];n++;}return n?z/n/255:0;};
-    low=avg(1,Math.floor(maxBin*.08)); mid=avg(Math.floor(maxBin*.08),Math.floor(maxBin*.42)); high=avg(Math.floor(maxBin*.42),maxBin);
-    for(let i=0;i<N;i++){
-      const a=Math.max(1,Math.floor(Math.pow(i/N,1.72)*maxBin));
-      const b=Math.max(a+1,Math.floor(Math.pow((i+1)/N,1.72)*maxBin));
-      let peak=0, sum=0, count=0;
-      for(let k=a;k<Math.min(b,viz.data.length);k++){const v=viz.data[k]/255;sum+=v;peak=Math.max(peak,v);count++;}
-      const mean=count?sum/count:0;
-      const target=Math.min(1,Math.pow(mean*.72+peak*.28,.76)*1.42);
-      viz.bars[i]+=(target-viz.bars[i])*(target > viz.bars[i] ? .62 : .105);
-    }
-  } else if (playing) {
-    // Safe visual fallback if the station disallows cross-origin audio analysis.
-    viz.t += .024;
-    low=.12+.08*Math.abs(Math.sin(viz.t*1.7)); mid=.10+.12*Math.abs(Math.sin(viz.t*2.3+1)); high=.06+.12*Math.abs(Math.sin(viz.t*3.1+2));
-    for(let i=0;i<N;i++){const target=.04+.23*Math.abs(Math.sin(viz.t*(1.05+i*.027)+i*.69));viz.bars[i]+=(target-viz.bars[i])*.18;}
-  } else {
-    for(let i=0;i<N;i++) viz.bars[i]*=.90;
+const viz = { bars:new Array(N).fill(0), peaks:new Array(N).fill(0), t:0, raf:0, data:null, ranges:null, vuL:0, vuR:0, lastFrame:0, lastDraw:0, lastThemeAt:0, surfaces:new Map(), theme:{c0:'#5e2607',c1:'#b84d0b',c2:'#ffae45',c3:'#ffe1a0',peak:'#fff0c8',grid:'rgba(45,22,7,.15)',vu:'#ffd17c',vuDark:'#6a2b08'} };
+function vizTheme(now) {
+  if (now - viz.lastThemeAt < 900) return;
+  viz.lastThemeAt = now;
+  const screen = document.querySelector('.orange-screen');
+  if (!screen) return;
+  const st = getComputedStyle(screen);
+  const get = (n, fallback) => st.getPropertyValue(n).trim() || fallback;
+  Object.assign(viz.theme, {
+    c0:get('--viz-c0','#5e2607'), c1:get('--viz-c1','#b84d0b'),
+    c2:get('--viz-c2','#ffae45'), c3:get('--viz-c3','#ffe1a0'),
+    peak:get('--viz-peak','#fff0c8'), grid:get('--viz-grid','rgba(45,22,7,.15)'),
+    vu:get('--viz-vu','#ffd17c'), vuDark:get('--viz-vu-dark','#6a2b08')
+  });
+  for (const surface of viz.surfaces.values()) surface.gradient = null;
+}
+function vizSurface(canvas) {
+  if (!canvas) return null;
+  let surface = viz.surfaces.get(canvas);
+  if (!surface) {
+    const ctx = canvas.getContext('2d', {alpha:true, desynchronized:true});
+    if (!ctx) return null;
+    surface = {ctx,w:0,h:0,dpr:0,gradient:null,barX:new Float32Array(N),barW:0,base:0,top:0,totalH:0};
+    viz.surfaces.set(canvas,surface);
   }
-  viz.vuL+=(Math.max(low,rms*.9)-viz.vuL)*.24;
-  viz.vuR+=(Math.max(mid,rms*.65)-viz.vuR)*.24;
-  // Draw both the home spectrum and the expanded player spectrum in crisp device pixels.
-  for(const c of [$('#homeViz'),$('#viz')]){
-    if(!c || !c.isConnected) continue;
-    const w=c.clientWidth,h=c.clientHeight;if(!w||!h)continue;
-    const dpr=Math.min(2.5,window.devicePixelRatio||1),pw=Math.round(w*dpr),ph=Math.round(h*dpr);
-    if(c.width!==pw||c.height!==ph){c.width=pw;c.height=ph;}
-    const g=c.getContext('2d');if(!g)continue;
-    g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
-    // Technical grid and baseline.
-    g.strokeStyle='rgba(45,22,7,.17)';g.lineWidth=1;
-    for(let y=12;y<h-5;y+=Math.max(18,h/5)){g.beginPath();g.moveTo(0,y);g.lineTo(w,y);g.stroke();}
-    const base=h-7,top=8,gap=Math.max(1,w*.004),bw=(w-gap*(N-1))/N,unit=Math.max(2.1,Math.min(4.1,h*.026)),segGap=Math.max(1.2,unit*.42),totalH=base-top;
-    const lcdStyle=c.id==='homeViz' ? getComputedStyle(c.closest('.orange-screen')) : null;
-    const lcdColor=(name,fallback)=>lcdStyle ? (lcdStyle.getPropertyValue(name).trim()||fallback) : fallback;
+  const w=canvas.clientWidth,h=canvas.clientHeight;
+  if(!w||!h)return null;
+  const phone=window.matchMedia('(max-width:820px)').matches;
+  const dpr=Math.min(phone?1.35:1.8,window.devicePixelRatio||1);
+  if(surface.w!==w||surface.h!==h||surface.dpr!==dpr){
+    surface.w=w;surface.h=h;surface.dpr=dpr;
+    canvas.width=Math.max(1,Math.round(w*dpr));canvas.height=Math.max(1,Math.round(h*dpr));
+    surface.ctx.setTransform(dpr,0,0,dpr,0,0);
+    const gap=Math.max(1,w*.004);surface.barW=Math.max(1,(w-gap*(N-1))/N);
+    for(let i=0;i<N;i++)surface.barX[i]=i*(surface.barW+gap);
+    surface.base=h-7;surface.top=8;surface.totalH=surface.base-surface.top;surface.gradient=null;
+  }
+  if(!surface.gradient){
+    const g=surface.ctx.createLinearGradient(0,surface.base,0,surface.top);
+    g.addColorStop(0,viz.theme.c0);g.addColorStop(.45,viz.theme.c1);g.addColorStop(.82,viz.theme.c2);g.addColorStop(1,viz.theme.c3);
+    surface.gradient=g;
+  }
+  return surface;
+}
+function frame(now=0) {
+  viz.raf=requestAnimationFrame(frame);
+  if(document.hidden)return;
+  const playing=state.status==='playing';
+  // Idle receiver: 24 fps is enough; active audio stays synced to the device frame clock.
+  if(!playing&&now-viz.lastDraw<40)return;
+  viz.lastDraw=now;
+  const dt=Math.min(.05,Math.max(.008,(now-(viz.lastFrame||now-16.67))/1000));viz.lastFrame=now;
+  let low=0,mid=0,high=0,rms=0;
+  const active=playing&&graph&&audio===fxAudio&&ctx&&ctx.state==='running';
+  if(active){
+    const analyser=graph.analyser;
+    if(!viz.data||viz.data.length!==analyser.frequencyBinCount){
+      viz.data=new Uint8Array(analyser.frequencyBinCount);
+      const maxBin=Math.max(2,viz.data.length-1);
+      viz.ranges=Array.from({length:N},(_,i)=>{
+        const a=Math.max(1,Math.floor(Math.pow(i/N,1.72)*maxBin));
+        return [a,Math.max(a+1,Math.floor(Math.pow((i+1)/N,1.72)*maxBin))];
+      });
+    }
+    analyser.getByteFrequencyData(viz.data);
+    const avg=(a,b)=>{let z=0,n=0;for(let k=a;k<Math.min(b,viz.data.length);k+=3){z+=viz.data[k];n++;}return n?z/n/255:0;};
+    const maxBin=viz.data.length-1;
+    low=avg(1,Math.floor(maxBin*.08));mid=avg(Math.floor(maxBin*.08),Math.floor(maxBin*.42));high=avg(Math.floor(maxBin*.42),maxBin);
+    // Frequency-weighted level keeps the VU responsive without a second time-domain buffer read.
+    rms=Math.min(1,(low*.42+mid*.38+high*.20));
+    const attack=1-Math.exp(-dt*25),release=1-Math.exp(-dt*8.5);
     for(let i=0;i<N;i++){
-      const v=Math.max(0,Math.min(1,viz.bars[i]));
-      const barH=Math.max(v>.018?unit:0,v*totalH);
-      const x=i*(bw+gap),y=base-barH;
-      const grad=g.createLinearGradient(0,base,0,Math.max(top,y));
-      grad.addColorStop(0,lcdColor('--viz-c0','#5e2607'));grad.addColorStop(.45,lcdColor('--viz-c1','#b84d0b'));grad.addColorStop(.82,lcdColor('--viz-c2','#ffae45'));grad.addColorStop(1,lcdColor('--viz-c3','#ffe1a0'));
-      g.shadowColor=lcdColor('--lcd-glow','rgba(255,112,18,.55)');g.shadowBlur=playing?7:2;g.fillStyle=grad;
-      const radius=Math.min(bw/2,2.5);g.beginPath();g.roundRect(x,y,Math.max(1,bw),barH,radius);g.fill();
-      viz.peaks[i]=Math.max(viz.peaks[i],v);viz.peaks[i]=Math.max(0,viz.peaks[i]-.0075);
-      const py=base-viz.peaks[i]*totalH;
-      g.shadowBlur=4;g.fillStyle=lcdColor('--viz-peak','#fff0c8');g.globalAlpha=.9;g.fillRect(x,py,Math.max(1,bw),1.5);g.globalAlpha=1;
+      const [a,b]=viz.ranges[i];let sum=0,peak=0,count=0;
+      for(let k=a;k<Math.min(b,viz.data.length);k+=3){const v=viz.data[k]/255;sum+=v;peak=Math.max(peak,v);count++;}
+      const mean=count?sum/count:0,target=Math.min(1,Math.pow(mean*.68+peak*.32,.72)*1.5);
+      viz.bars[i]+=(target-viz.bars[i])*(target>viz.bars[i]?attack:release);
     }
-    g.shadowBlur=0;
-    // Two compact VU traces add movement even at low volume without masking the spectrum.
-    if(h>85){
-      const vuY=h-1.5;g.globalAlpha=.45;g.strokeStyle=lcdColor('--viz-vu-dark','#6a2b08');g.lineWidth=1.5;
-      g.beginPath();g.moveTo(0,vuY);g.lineTo(w*viz.vuL,vuY);g.stroke();
-      g.globalAlpha=.8;g.strokeStyle=lcdColor('--viz-vu','#ffd17c');g.beginPath();g.moveTo(w*.52,vuY);g.lineTo(w*(.52+.46*viz.vuR),vuY);g.stroke();g.globalAlpha=1;
+  }else if(playing){
+    viz.t+=dt*1.6;low=.12+.08*Math.abs(Math.sin(viz.t*1.7));mid=.10+.12*Math.abs(Math.sin(viz.t*2.3+1));high=.06+.12*Math.abs(Math.sin(viz.t*3.1+2));
+    const k=1-Math.exp(-dt*12);for(let i=0;i<N;i++){const target=.04+.23*Math.abs(Math.sin(viz.t*(1.05+i*.027)+i*.69));viz.bars[i]+=(target-viz.bars[i])*k;}
+  }else{
+    const k=1-Math.exp(-dt*9);for(let i=0;i<N;i++)viz.bars[i]*=(1-k);
+  }
+  const vuK=1-Math.exp(-dt*13);viz.vuL+=(Math.max(low,rms*.9)-viz.vuL)*vuK;viz.vuR+=(Math.max(mid,rms*.65)-viz.vuR)*vuK;
+  vizTheme(now);
+  const phone=window.matchMedia('(max-width:820px)').matches;
+  // The phone's hardware screen is the primary display. Skip the hidden player canvas entirely.
+  const canvases=phone?[$('#homeViz')]:[$('#homeViz'),...($('#sheet')?.classList.contains('open')?[$('#viz')]:[])];
+  for(const canvas of canvases){
+    const surface=vizSurface(canvas);if(!surface)continue;
+    const g=surface.ctx,w=surface.w,h=surface.h,base=surface.base,totalH=surface.totalH,barW=surface.barW;
+    g.clearRect(0,0,w,h);
+    g.shadowBlur=0;g.globalAlpha=1;g.strokeStyle=viz.theme.grid;g.lineWidth=1;
+    // Fixed guide lines are deliberately sparse to reduce mobile canvas overdraw.
+    g.beginPath();g.moveTo(0,h*.25);g.lineTo(w,h*.25);g.moveTo(0,h*.60);g.lineTo(w,h*.60);g.stroke();
+    g.fillStyle=surface.gradient;
+    for(let i=0;i<N;i++){
+      const v=Math.max(0,Math.min(1,viz.bars[i])),barH=Math.max(v>.018?2:0,v*totalH),x=surface.barX[i],y=base-barH;
+      if(barH>0)g.fillRect(x,y,barW,barH);
+      viz.peaks[i]=Math.max(viz.peaks[i],v);
+      viz.peaks[i]=Math.max(0,viz.peaks[i]-(1-Math.exp(-dt*.82)));
     }
+    g.fillStyle=viz.theme.peak;g.globalAlpha=.82;
+    for(let i=0;i<N;i++){const p=viz.peaks[i];if(p>.025)g.fillRect(surface.barX[i],base-p*totalH,barW,1.25);}
+    g.globalAlpha=.36;g.strokeStyle=viz.theme.vuDark;g.lineWidth=1.4;
+    const vuY=h-1.5;g.beginPath();g.moveTo(0,vuY);g.lineTo(w*viz.vuL,vuY);g.stroke();
+    g.globalAlpha=.78;g.strokeStyle=viz.theme.vu;g.beginPath();g.moveTo(w*.52,vuY);g.lineTo(w*(.52+.46*viz.vuR),vuY);g.stroke();g.globalAlpha=1;
   }
 }
 const startViz=()=>{if(!viz.raf)viz.raf=requestAnimationFrame(frame);};
@@ -1460,6 +1632,7 @@ function applyTheme() {
   r.dataset.eff = eff; r.dataset.accent = s.accent;
   $('meta[name="theme-color"]').content = eff === 'dark' ? '#0C1024' : '#F2F3FA';
   vizColor = getComputedStyle(r).getPropertyValue('--a-dark').trim() || '#FFB84D';
+  if(state.settings && $('#wallpaperGrid')) applyWallpaper();
 }
 const colorSchemeQuery = matchMedia('(prefers-color-scheme: dark)');
 if (colorSchemeQuery.addEventListener) colorSchemeQuery.addEventListener('change', applyTheme);
@@ -1467,6 +1640,7 @@ else if (colorSchemeQuery.addListener) colorSchemeQuery.addListener(applyTheme);
 
 function buildSettingsUI() {
   $('#preset').innerHTML = Object.keys(PRESETS).map(k => '<option value="' + k + '">' + PRESET_LABELS[k] + '</option>').join('') + '<option value="custom">سفارشی</option>';
+  if ($('#audioQuality')) $('#audioQuality').value = state.settings.quality || 'balanced';
   $('#bands').innerHTML = BANDS.map((b, i) => '<label class="row-range"><span>' + b.l + '</span><input type="range" min="-12" max="12" step="1" data-band="' + i + '" aria-label="' + b.l + '"><output id="bo' + i + '"></output></label>').join('');
   $('#sleepChips').innerHTML = [0, 15, 30, 45, 60, 90].map(m => '<button class="chip" data-min="' + m + '" aria-pressed="false">' + (m ? faNum(m) + ' دقیقه' : 'خاموش') + '</button>').join('');
 }
@@ -1475,6 +1649,8 @@ function syncSettingsUI() {
   $$('#segTheme button').forEach(b => b.setAttribute('aria-pressed', b.dataset.theme === s.theme));
   $$('#swatches button').forEach(b => b.setAttribute('aria-pressed', b.dataset.accent === s.accent));
   $('#fxOn').checked = s.fx; $('#compOn').checked = s.comp;
+  if ($('#loudnessOn')) $('#loudnessOn').checked = !!s.loudness;
+  if ($('#audioQuality')) $('#audioQuality').value = s.quality || 'balanced';
   $('#fxPanel').classList.toggle('dim', !s.fx);
   $('#preset').value = s.preset;
   s.bands.forEach((v, i) => { $('[data-band="' + i + '"]').value = v; $('#bo' + i).textContent = (v > 0 ? '+' : '') + v; });
@@ -1569,7 +1745,41 @@ $('#homeTimer').onclick = () => openDrawer('timer');
 $('#homeNavFav').onclick = () => setTab('favs');
 $('#homeNavRecent').onclick = () => setTab('recent');
 $('#homeNavExplore').onclick = () => setTab('explore');
-$('#homeNavStations').onclick = () => { document.querySelector('#filters').scrollIntoView({behavior:'smooth'}); };
+function toggleStationPanel(force) {
+  const panel=$('#stationPanel'), button=$('#homeNavStations');
+  if(!panel||!button)return;
+  const open=typeof force==='boolean'?force:!panel.classList.contains('is-open');
+  panel.classList.toggle('is-open',open); panel.setAttribute('aria-hidden',String(!open)); button.setAttribute('aria-expanded',String(open));
+  button.classList.toggle('active',open);
+  if(open){ panel.scrollIntoView({behavior:'smooth',block:'start'}); }
+}
+$('#homeNavStations').onclick = () => toggleStationPanel();
+$('#refreshStations').onclick = async () => { const b=$('#refreshStations'); b.disabled=true; $('#stationSyncLabel').textContent='Updating station sources…'; await refreshStationCatalogue(true); b.disabled=false; $('#stationSyncLabel').textContent='Updated '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}); toast('فهرست ایستگاه‌ها به‌روزرسانی شد'); };
+$('#audioQuality')?.addEventListener('change',e=>{
+  state.settings.quality=e.target.value;
+  const profile={responsive:{fft:1024,smooth:.42},balanced:{fft:2048,smooth:.54},studio:{fft:4096,smooth:.62}}[state.settings.quality]||{fft:2048,smooth:.54};
+  if(graph){graph.analyser.fftSize=profile.fft;graph.analyser.smoothingTimeConstant=profile.smooth;viz.data=null;viz.wave=null;viz.ranges=null;}
+  $('#qualityOut').textContent=state.settings.quality==='studio'?'HI-RES FFT':state.settings.quality==='responsive'?'LOW LATENCY':'48 BANDS';
+  saveSettings();
+});
+$('#loudnessOn')?.addEventListener('change',e=>{state.settings.loudness=e.target.checked;applySound();saveSettings();});
+function applyWallpaper(){
+  const w=state.settings.wallpaper||'carbon';document.documentElement.dataset.wallpaper=state.settings.customWallpaper?'custom':w;
+  if(state.settings.customWallpaper)document.documentElement.style.setProperty('--custom-radio-wallpaper','url("'+state.settings.customWallpaper.replace(/"/g,'%22')+'")');
+  else document.documentElement.style.removeProperty('--custom-radio-wallpaper');
+  $('#wallpaperGrid')?.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(!state.settings.customWallpaper&&b.dataset.wallpaper===w)));
+}
+$('#wallpaperGrid')?.addEventListener('click',e=>{const b=e.target.closest('button[data-wallpaper]');if(!b)return;state.settings.wallpaper=b.dataset.wallpaper;state.settings.customWallpaper='';applyWallpaper();saveSettings();});
+$('#clearBackground')?.addEventListener('click',()=>{state.settings.wallpaper='carbon';state.settings.customWallpaper='';applyWallpaper();saveSettings();});
+$('#backgroundFile')?.addEventListener('change',e=>{
+  const file=e.target.files&&e.target.files[0];if(!file)return;
+  if(!file.type.startsWith('image/')){toast('فقط فایل تصویر انتخاب کن');return;}
+  if(file.size>12*1024*1024){toast('تصویر باید کمتر از ۱۲ مگابایت باشد');e.target.value='';return;}
+  const url=URL.createObjectURL(file),img=new Image();
+  img.onload=()=>{try{const max=1600,scale=Math.min(1,max/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.round(img.width*scale);c.height=Math.round(img.height*scale);const g=c.getContext('2d');g.drawImage(img,0,0,c.width,c.height);const data=c.toDataURL('image/jpeg',.76);if(data.length>2200000)throw new Error('large');state.settings.customWallpaper=data;state.settings.wallpaper='custom';applyWallpaper();saveSettings();toast('پس‌زمینه شخصی ذخیره شد');}catch(err){toast('حجم تصویر زیاد است؛ تصویر کوچک‌تری انتخاب کن');}finally{URL.revokeObjectURL(url);e.target.value='';}};
+  img.onerror=()=>{URL.revokeObjectURL(url);e.target.value='';toast('خواندن تصویر ممکن نشد');};img.src=url;
+});
+
 $('#miniOpen').onclick = openSheet;
 $('#miniPlay').onclick = togglePlay;
 $('#bigPlay').onclick = togglePlay;
@@ -1622,27 +1832,75 @@ $('#chips').addEventListener('click', e => {
   buildChips(); buildSettingsUI(); applyTheme(); syncSettingsUI(); renderSleep();
   $('#bigPlay').innerHTML = ICON_PLAY; $('#mute').innerHTML = ICON_VOL;
   discover(); startViz();
-  const updateScreenClock=()=>{const d=new Date();$('#screenClock').textContent=[d.getHours(),d.getMinutes(),d.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':');};
+  const updateScreenClock=()=>{const d=new Date();$('#screenClock').textContent=[d.getHours(),d.getMinutes(),d.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':');const date=$('#screenDate');if(date)date.textContent=new Intl.DateTimeFormat('en-GB',{day:'2-digit',month:'short',year:'numeric'}).format(d).toUpperCase();};
   updateScreenClock(); setInterval(updateScreenClock,1000);
-  const [settings, favs, recent] = await Promise.all([kv.get('radio:settings'), kv.get('radio:favs'), kv.get('radio:recent')]);
+  const [settings, favs, recent, stationCache] = await Promise.all([kv.get('radio:settings'), kv.get('radio:favs'), kv.get('radio:recent'), kv.get('radio:stationCache')]);
   if (settings) {
     Object.assign(state.settings, settings);
     if (!Array.isArray(state.settings.bands) || state.settings.bands.length !== 5) state.settings.bands = [0,0,0,0,0];
+    if (!['responsive','balanced','studio'].includes(state.settings.quality)) state.settings.quality='balanced';
   }
+  if (stationCache && Array.isArray(stationCache.stations) && stationCache.stations.length) { state.stations = stationCache.stations; state.stations.forEach(st=>state.byId.set(st.stationuuid,st)); }
   (favs || []).forEach(s => { state.favs.set(s.stationuuid, s); state.byId.set(s.stationuuid, s); });
   state.recent = Array.isArray(recent) ? recent : [];
   plainAudio.volume = state.settings.volume;
-  state.stations = fallbackStations();
+  if (!state.stations.length) state.stations = fallbackStations();
   state.stations.forEach(st => state.byId.set(st.stationuuid, st));
-  applyTheme(); syncSettingsUI();
+  applyTheme(); applyWallpaper(); syncSettingsUI();
+  if($('#audioQuality')){$('#audioQuality').value=state.settings.quality||'balanced';$('#qualityOut').textContent=(state.settings.quality||'balanced')==='studio'?'HI-RES FFT':(state.settings.quality||'balanced')==='responsive'?'LOW LATENCY':'48 BANDS';}
+  if(document.documentElement.classList.contains('android-native-app') || window.ZebelNative)toggleStationPanel(false);
   setKnobVolume(state.settings.volume);
   window.syncAmpToneControls?.();
   $('#tuningKnob').style.setProperty('--dial-angle','-135deg');
   render();
   loadCountries();
-  loadStations();
+  loadStations().then(()=>refreshPinnedStations());
   if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
 })();
+
+
+let pinnedRefreshBusy=false;
+async function refreshPinnedStations(){
+  if(pinnedRefreshBusy)return;
+  const all=[...state.favs.values(),...state.recent].filter(x=>x&&x.stationuuid&&!String(x.stationuuid).startsWith('fb-'));
+  const ids=[...new Set(all.map(x=>x.stationuuid))].slice(0,80);
+  if(!ids.length)return;
+  pinnedRefreshBusy=true;
+  try{
+    const fresh=await api('/json/stations/byuuid?uuids='+encodeURIComponent(ids.join(',')));
+    const map=new Map((fresh||[]).map(x=>[x.stationuuid,x]));
+    if(state.cur&&map.has(state.cur.stationuuid)){
+      const latest=map.get(state.cur.stationuuid),oldUrl=state.cur.url_resolved||state.cur.url,newUrl=latest.url_resolved||latest.url;
+      state.cur=latest;state.byId.set(latest.stationuuid,latest);
+      if(oldUrl&&newUrl&&oldUrl!==newUrl&&isBusy()){state.retries=0;state.token++;startStream();}
+      syncPlayer();
+    }
+    for(const [id,st] of map){state.byId.set(id,st);if(state.favs.has(id))state.favs.set(id,st);}
+    state.recent=state.recent.map(st=>map.get(st.stationuuid)||st);
+    await saveFavs();await saveRecent();
+  }catch(e){}finally{pinnedRefreshBusy=false;}
+}
+
+let refreshBusy=false;
+async function refreshStationCatalogue(force=false){
+  if(refreshBusy)return;
+  const last=Number(await kv.get('radio:stationSyncAt')||0);
+  if(!force&&last&&Date.now()-last<6*60*60*1000)return;
+  refreshBusy=true;
+  const previousTab=state.tab;
+  try{
+    // Refresh the master catalogue even while the user is looking at Favorites or Recent.
+    state.tab='explore';
+    await discover(); await loadStations(false); await loadCountries(); await refreshPinnedStations();
+  } finally {
+    state.tab=previousTab;
+    if(previousTab!=='explore')render();
+    refreshBusy=false;
+  }
+}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshStationCatalogue(false);});
+setInterval(()=>{if(!document.hidden)refreshStationCatalogue(false);},60*60*1000);
+
 </script>
 
 <script>
@@ -1740,45 +1998,3 @@ $('#chips').addEventListener('click', e => {
     const band = Number(el.dataset.toneBand);
     paint(el, clamp(Number(state?.settings?.bands?.[band] ?? 0)));
   });
-  const update = (el, raw) => {
-    if (typeof state === 'undefined' || !state.settings) return;
-    const band = Number(el.dataset.toneBand), value = clamp(raw);
-    state.settings.bands[band] = value;
-    state.settings.preset = 'custom';
-    const slider = document.querySelector(`[data-band="${band}"]`);
-    const output = document.getElementById('bo' + band);
-    if (slider) slider.value = String(value);
-    if (output) output.textContent = (value > 0 ? '+' : '') + value;
-    const preset = document.getElementById('preset');
-    if (preset) preset.value = 'custom';
-    try { if (typeof applySound === 'function') applySound(); } catch (_) {}
-    try { if (typeof saveSettings === 'function') saveSettings(); } catch (_) {}
-    paint(el, value);
-  };
-  const angleAt = (el,e) => { const r=el.getBoundingClientRect(); return Math.atan2(e.clientY-(r.top+r.height/2),e.clientX-(r.left+r.width/2))*180/Math.PI; };
-  const delta = (a,b) => { let d=a-b; while(d>180)d-=360; while(d<-180)d+=360; return d; };
-  controls.forEach(el => {
-    let dragging=false,lastAngle=0,current=0;
-    const band=Number(el.dataset.toneBand);
-    const get=()=>clamp(Number(state?.settings?.bands?.[band] ?? 0));
-    el.addEventListener('pointerdown',e=>{ dragging=true; current=get(); lastAngle=angleAt(el,e); el.classList.add('is-turning'); el.setPointerCapture?.(e.pointerId); e.preventDefault(); });
-    el.addEventListener('pointermove',e=>{ if(!dragging)return; const a=angleAt(el,e),d=delta(a,lastAngle); lastAngle=a; current=clamp(current+d*(24/270)); update(el,current); });
-    const end=()=>{dragging=false;el.classList.remove('is-turning');};
-    el.addEventListener('pointerup',end); el.addEventListener('pointercancel',end);
-    el.addEventListener('wheel',e=>{e.preventDefault();update(el,get()-(e.deltaY||e.deltaX)*.035);},{passive:false});
-    el.addEventListener('keydown',e=>{
-      if(e.key==='ArrowUp'||e.key==='ArrowRight'){e.preventDefault();update(el,get()+1);}
-      else if(e.key==='ArrowDown'||e.key==='ArrowLeft'){e.preventDefault();update(el,get()-1);}
-      else if(e.key==='Home'){e.preventDefault();update(el,-12);}
-      else if(e.key==='End'){e.preventDefault();update(el,12);}
-      else if(e.key==='0'){e.preventDefault();update(el,0);}
-    });
-    el.addEventListener('dblclick',()=>update(el,0));
-  });
-  window.syncAmpToneControls?.();
-  setTimeout(()=>window.syncAmpToneControls?.(),350);
-})();
-</script>
-
-</body>
-</html>
