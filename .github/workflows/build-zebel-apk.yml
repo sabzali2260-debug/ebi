@@ -27,20 +27,32 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.13'
-      - name: Build debug APK
-        run: gradle --no-daemon --stacktrace :app:assembleDebug
-      - name: Verify APK and package identity
+      - name: Build fresh APK
+        run: gradle --no-daemon --stacktrace clean :app:assembleDebug
+      - name: Verify APK contains the one-screen mobile app
+        shell: bash
         run: |
+          set -euo pipefail
           APK=app/build/outputs/apk/debug/app-debug.apk
           test -s "$APK"
           file "$APK"
           unzip -t "$APK"
-          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | grep -F "package: name='com.zebel.radio.v13' versionCode='1' versionName='1.3.0'"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | grep -F "package: name='com.zebel.radio.v14' versionCode='1' versionName='1.4.1'"
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$APK"
-      - name: Upload APK artifact
+          unzip -p "$APK" assets/index.html > /tmp/zebel-apk-index.html
+          grep -F 'data-build="zebel-radio-1.4.1"' /tmp/zebel-apk-index.html
+          grep -F 'id="stationWheel"' /tmp/zebel-apk-index.html
+          grep -F 'id="mainVolumeSlider"' /tmp/zebel-apk-index.html
+          grep -F 'new FileReader()' /tmp/zebel-apk-index.html
+          grep -F 'zebel-1-4-final-roller-visibility' /tmp/zebel-apk-index.html
+          grep -F '.legacy-controls' /tmp/zebel-apk-index.html
+          grep -F '.station-strip' /tmp/zebel-apk-index.html
+          grep -F '.console-bottom' /tmp/zebel-apk-index.html
+          unzip -l "$APK" | grep -F 'ic_launcher.png'
+      - name: Upload installable APK
         uses: actions/upload-artifact@v4
         with:
-          name: ZEBEL-RADIO-APK
+          name: ZEBEL-RADIO-1.4.1-APK
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 30
