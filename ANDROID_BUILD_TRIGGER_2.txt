@@ -1,0 +1,1 @@
+Trigger APK workflow after the SDK setup fix.
