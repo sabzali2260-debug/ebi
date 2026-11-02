@@ -25,6 +25,7 @@ class DashboardActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!prefs.getBoolean("dashboard_040_migrated", false)) prefs.edit().putInt("siren_volume", 100).putBoolean("dashboard_040_migrated", true).apply()
         window.statusBarColor = bg
         window.navigationBarColor = bg
         window.decorView.systemUiVisibility = 0
