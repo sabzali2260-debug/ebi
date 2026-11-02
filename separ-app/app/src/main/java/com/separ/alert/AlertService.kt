@@ -48,6 +48,12 @@ class AlertService : Service() {
         city = intent?.getStringExtra(EXTRA_CITY) ?: "کل ایران"
         voiceProfile = intent?.getStringExtra(EXTRA_VOICE) ?: "female"
         isTest = intent?.getBooleanExtra(EXTRA_TEST, true) ?: true
+        val minimumLevel = getSharedPreferences("separ_prefs", MODE_PRIVATE)
+            .getInt("minimum_level", 1).coerceIn(1, 3)
+        if (!isTest && level < minimumLevel) {
+            stopSelf(startId)
+            return START_NOT_STICKY
+        }
         val levelLabel = levelLabel(level)
         message = if (isTest) {
             "آزمایش سطح $levelLabel برنامهٔ سپر. محدودهٔ انتخاب‌شده: $city. این پیام واقعی نیست."
