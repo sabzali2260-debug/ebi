@@ -33,8 +33,8 @@ class EmbeddedPersianVoice(private val context: Context) {
             media.setOnErrorListener { _, _, _ -> releasePlayer(); true }
             media.setDataSource(output.absolutePath)
             media.setVolume(1.0f, 1.0f)
-            media.prepareAsync()
             media.setOnPreparedListener { if (player === media) media.start() }
+            media.prepareAsync()
         } catch (_: Exception) {
             releasePlayer()
         }
