@@ -87,6 +87,19 @@ class DashboardActivity : Activity() {
         addToggle(settings, "لرزش هشدار", "vibration", true)
         addToggle(settings, "تکرار پیام صوتی سطح اضطراری", "repeat_speech", true)
         addToggle(settings, "فعال بودن هشدارهای سطح ۱", "allow_level_1", true)
+        settings.addView(text("صدای گویای هشدار (بدون نیاز به نصب روی گوشی)", 12, green, true))
+        val voicePicker = Spinner(this).apply {
+            adapter = ArrayAdapter(this@DashboardActivity, android.R.layout.simple_spinner_dropdown_item, listOf("صدای بم", "صدای زیر"))
+            setSelection(if (prefs.getString("preferred_voice", "female") == "male") 0 else 1)
+        }
+        voicePicker.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: View?, position: Int, id: Long) {
+                prefs.edit().putString("preferred_voice", if (position == 0) "male" else "female").apply()
+            }
+            override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {}
+        }
+        settings.addView(voicePicker, LinearLayout.LayoutParams(-1, dp(48)))
+        settings.addView(text("هر دو پیام صوتی فارسی داخل برنامه بسته‌بندی می‌شوند و آفلاین پخش می‌شوند. این دو پروفایل صدای مصنوعی با زیر و بمی متفاوت‌اند، نه ضبط انسانی.", 10, dim))
         settings.addView(text("شدت آژیر  •  صدای خروجی گوشی نیز باید بالا باشد", 12, green, true))
         val volumeLabel = text("", 11, dim)
         val volume = SeekBar(this).apply {
