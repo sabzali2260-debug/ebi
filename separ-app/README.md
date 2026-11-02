@@ -34,3 +34,6 @@ gradle --no-daemon -p separ-app :app:assembleDebug
 - نقشهٔ پایه به اینترنت نیاز دارد؛ نقشهٔ آفلاین و لایه‌های قانونی/دقیق مختصات NOTAM هنوز در این نسخه فراهم نیستند.
 
 این برنامه ابزار کمکی آزمایشی است و جایگزین هشدارهای رسمی عمومی، دستورهای اضطراری، NOTAM/AIP یا خدمات ایمنی دولتی نیست.
+
+
+SEPAR 0.4.2 bundles the supplied air-raid siren audio locally in the app assets.
