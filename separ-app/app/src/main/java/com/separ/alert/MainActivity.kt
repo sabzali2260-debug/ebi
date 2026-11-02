@@ -21,6 +21,7 @@ import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.ScrollView
+import android.widget.SeekBar
 import android.widget.Spinner
 import android.widget.Switch
 import android.widget.TextView
@@ -142,6 +143,43 @@ class MainActivity : Activity() {
             }
         }
         settingsCard.addView(vibration, matchWidth())
+
+        settingsCard.addView(label("شدت آژیر", 14, navy, true))
+        val sirenVolumeLabel = label("۸۲٪", 12, muted)
+        val sirenVolume = SeekBar(this).apply {
+            max = 100
+            progress = prefs.getInt("siren_volume", 82).coerceIn(10, 100)
+            setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                    val value = progress.coerceIn(10, 100)
+                    sirenVolumeLabel.text = "$value٪"
+                    prefs.edit().putInt("siren_volume", value).apply()
+                }
+                override fun onStartTrackingTouch(seekBar: SeekBar?) = Unit
+                override fun onStopTrackingTouch(seekBar: SeekBar?) = Unit
+            })
+        }
+        settingsCard.addView(sirenVolumeLabel)
+        settingsCard.addView(sirenVolume, matchWidth())
+
+        settingsCard.addView(label("سرعت گفتار فارسی", 14, navy, true))
+        val speechRateLabel = label("۹۳٪", 12, muted)
+        val speechRate = SeekBar(this).apply {
+            max = 115
+            progress = prefs.getInt("speech_rate", 93).coerceIn(75, 115)
+            min = 75
+            setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                    val value = progress.coerceIn(75, 115)
+                    speechRateLabel.text = "$value٪"
+                    prefs.edit().putInt("speech_rate", value).apply()
+                }
+                override fun onStartTrackingTouch(seekBar: SeekBar?) = Unit
+                override fun onStopTrackingTouch(seekBar: SeekBar?) = Unit
+            })
+        }
+        settingsCard.addView(speechRateLabel)
+        settingsCard.addView(speechRate, matchWidth())
 
         val repeatSpeech = Switch(this).apply {
             text = "تکرار گفتار در سطح اضطراری"
