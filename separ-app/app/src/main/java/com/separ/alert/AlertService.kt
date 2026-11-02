@@ -8,6 +8,8 @@ import android.app.Service
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.media.AudioManager
+import android.media.AudioAttributes
+import android.media.AudioFocusRequest
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
@@ -26,6 +28,9 @@ class AlertService : Service() {
     private val mainHandler = Handler(Looper.getMainLooper())
     private var speech: TextToSpeech? = null
     private var wakeLock: PowerManager.WakeLock? = null
+    private var audioManager: AudioManager? = null
+    private var audioFocusRequest: AudioFocusRequest? = null
+    private val audioFocusListener = AudioManager.OnAudioFocusChangeListener { }
     private var level = 2
     private var city = "کل ایران"
     private var voiceProfile = "female"
@@ -64,6 +69,7 @@ class AlertService : Service() {
         createNotificationChannel()
         startForegroundCompat(buildNotification())
         acquireWakeLock()
+        requestAlarmAudioFocus()
 
         if (level >= 2) {
             val volume = getSharedPreferences("separ_prefs", MODE_PRIVATE)
@@ -137,6 +143,25 @@ class AlertService : Service() {
             }
             (getSystemService(NOTIFICATION_SERVICE) as NotificationManager)
                 .createNotificationChannel(channel)
+        }
+    }
+
+    private fun requestAlarmAudioFocus() {
+        try {
+            val manager = getSystemService(AUDIO_SERVICE) as AudioManager
+            audioManager = manager
+            val attributes = AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_ALARM)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build()
+            val request = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE)
+                .setAudioAttributes(attributes)
+                .setOnAudioFocusChangeListener(audioFocusListener)
+                .setWillPauseWhenDucked(false)
+                .build()
+            audioFocusRequest = request
+            manager.requestAudioFocus(request)
+        } catch (_: Exception) {
         }
     }
 
@@ -239,6 +264,11 @@ class AlertService : Service() {
         stopped = true
         mainHandler.removeCallbacksAndMessages(null)
         siren.stop()
+        try {
+            audioFocusRequest?.let { audioManager?.abandonAudioFocusRequest(it) }
+        } catch (_: Exception) { }
+        audioFocusRequest = null
+        audioManager = null
         try { speech?.stop(); speech?.shutdown() } catch (_: Exception) { }
         speech = null
         try {
