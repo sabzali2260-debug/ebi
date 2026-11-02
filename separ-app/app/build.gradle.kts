@@ -10,9 +10,9 @@ android {
     defaultConfig {
         applicationId = "com.separ.alert"
         minSdk = 31
-        targetSdk = 35
-        versionCode = 2
-        versionName = "0.2.1"
+        targetSdk = 36
+        versionCode = 3
+        versionName = "0.3.0"
     }
 
     compileOptions {
@@ -23,4 +23,8 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+}
+
+dependencies {
+    implementation("org.maplibre.gl:android-sdk:13.6.1")
 }
