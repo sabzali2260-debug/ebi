@@ -6,24 +6,81 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.media.AudioManager
-import android.media.ToneGenerator
 import android.os.Build
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.os.PowerManager
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import android.speech.tts.TextToSpeech
+import android.speech.tts.UtteranceProgressListener
+import android.speech.tts.Voice
 import java.util.Locale
 
 class AlertService : Service() {
-    private var tone: ToneGenerator? = null
+    private val siren = SirenPlayer()
+    private val mainHandler = Handler(Looper.getMainLooper())
     private var speech: TextToSpeech? = null
     private var wakeLock: PowerManager.WakeLock? = null
+    private var level = 2
+    private var city = "کل ایران"
+    private var voiceProfile = "female"
+    private var isTest = true
+    private var message = ""
+    private var stopped = false
+
+    private val repeatSpeech = object : Runnable {
+        override fun run() {
+            if (stopped || level < 3 || !getSharedPreferences("separ_prefs", MODE_PRIVATE)
+                    .getBoolean("repeat_speech", true)) return
+            speakAlert()
+            mainHandler.postDelayed(this, 22_000L)
+        }
+    }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val city = intent?.getStringExtra(EXTRA_CITY) ?: "محدودهٔ انتخاب‌شده"
-        val voice = intent?.getStringExtra(EXTRA_VOICE) ?: "مردانه"
-        createNotificationChannel()
+        stopped = false
+        level = (intent?.getIntExtra(EXTRA_LEVEL, 2) ?: 2).coerceIn(1, 3)
+        city = intent?.getStringExtra(EXTRA_CITY) ?: "کل ایران"
+        voiceProfile = intent?.getStringExtra(EXTRA_VOICE) ?: "female"
+        isTest = intent?.getBooleanExtra(EXTRA_TEST, true) ?: true
+        val levelLabel = levelLabel(level)
+        message = if (isTest) {
+            "آزمایش سطح $levelLabel برنامهٔ سپر. محدودهٔ انتخاب‌شده: $city. این پیام واقعی نیست."
+        } else {
+            "هشدار سپر برای محدودهٔ $city. سطح $levelLabel. اطلاعیهٔ منبع را بررسی کنید."
+        }
 
+        createNotificationChannel()
+        startForegroundCompat(buildNotification())
+        acquireWakeLock()
+
+        if (level >= 2) {
+            siren.start(if (level == 3) 0.95f else 0.78f)
+            startVibration()
+        }
+        initializeSpeech()
+        if (level == 3) mainHandler.postDelayed(repeatSpeech, 22_000L)
+        return START_NOT_STICKY
+    }
+
+    private fun startForegroundCompat(notification: Notification) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(
+                NOTIFICATION_ID,
+                notification,
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
+            )
+        } else {
+            startForeground(NOTIFICATION_ID, notification)
+        }
+    }
+
+    private fun buildNotification(): Notification {
         val stopIntent = PendingIntent.getBroadcast(
             this,
             2,
@@ -33,66 +90,29 @@ class AlertService : Service() {
         val screenIntent = PendingIntent.getActivity(
             this,
             1,
-            Intent(this, AlertActivity::class.java),
+            Intent(this, AlertActivity::class.java)
+                .putExtra(EXTRA_LEVEL, level)
+                .putExtra(EXTRA_CITY, city)
+                .putExtra(EXTRA_TEST, isTest),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
+        val manager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        val allowFullScreen = level >= 2 && (
+            Build.VERSION.SDK_INT < 34 || manager.canUseFullScreenIntent()
+        )
 
-        val notification = Notification.Builder(this, CHANNEL_ID)
+        return Notification.Builder(this, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_dialog_alert)
-            .setContentTitle("سپر | هشدار آزمایشی")
-            .setContentText("آزمایش صدا برای $city")
+            .setContentTitle("سپر | سطح $level · ${levelLabel(level)}")
+            .setContentText(if (isTest) "آزمایش برای $city" else "اعلان هشدار برای $city")
             .setCategory(Notification.CATEGORY_ALARM)
             .setVisibility(Notification.VISIBILITY_PUBLIC)
             .setOngoing(true)
-            .setFullScreenIntent(screenIntent, true)
-            .addAction(
-                android.R.drawable.ic_media_pause,
-                "توقف",
-                stopIntent
-            )
+            .setOnlyAlertOnce(true)
+            .setContentIntent(screenIntent)
+            .setFullScreenIntent(screenIntent, allowFullScreen)
+            .addAction(android.R.drawable.ic_media_pause, "توقف هشدار", stopIntent)
             .build()
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            startForeground(
-                NOTIFICATION_ID,
-                notification,
-                android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
-            )
-        } else {
-            startForeground(NOTIFICATION_ID, notification)
-        }
-
-        try {
-            val manager = getSystemService(POWER_SERVICE) as PowerManager
-            wakeLock = manager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "SEPAR:DemoAlert")
-            wakeLock?.acquire(180_000L)
-        } catch (_: Exception) {
-            // The alert demo remains active even if a wake lock is unavailable.
-        }
-
-        try {
-            tone?.release()
-            tone = ToneGenerator(AudioManager.STREAM_ALARM, 100).also {
-                it.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 5000)
-            }
-        } catch (_: Exception) {
-            // Some devices do not expose the requested system tone.
-        }
-
-        speech?.shutdown()
-        speech = TextToSpeech(this) { status ->
-            if (status == TextToSpeech.SUCCESS) {
-                val engine = speech ?: return@TextToSpeech
-                engine.setLanguage(Locale("fa", "IR"))
-                engine.speak(
-                    "این یک پیام آزمایشی از برنامهٔ سپر است. محدودهٔ انتخاب‌شده: $city. صدای انتخابی: $voice.",
-                    TextToSpeech.QUEUE_FLUSH,
-                    null,
-                    "separ-demo-alert"
-                )
-            }
-        }
-        return START_NOT_STICKY
     }
 
     private fun createNotificationChannel() {
@@ -102,29 +122,130 @@ class AlertService : Service() {
                 "هشدارهای سپر",
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "اعلان‌های آزمایشی برنامهٔ سپر"
+                description = "اعلان‌های هشدار و آزمایش آژیر سپر"
                 lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+                setSound(null, null)
+                enableVibration(level >= 2)
             }
             (getSystemService(NOTIFICATION_SERVICE) as NotificationManager)
                 .createNotificationChannel(channel)
         }
     }
 
-    override fun onDestroy() {
+    private fun acquireWakeLock() {
         try {
-            tone?.stopTone()
-            tone?.release()
+            val power = getSystemService(POWER_SERVICE) as PowerManager
+            wakeLock = power.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "SEPAR:Alert")
+            wakeLock?.acquire(10 * 60 * 1000L)
         } catch (_: Exception) {
         }
-        tone = null
-        speech?.stop()
-        speech?.shutdown()
+    }
+
+    private fun startVibration() {
+        val prefs = getSharedPreferences("separ_prefs", MODE_PRIVATE)
+        if (!prefs.getBoolean("vibration", true)) return
+        try {
+            val vibrator = if (Build.VERSION.SDK_INT >= 31) {
+                (getSystemService(VIBRATOR_MANAGER_SERVICE) as VibratorManager).defaultVibrator
+            } else {
+                @Suppress("DEPRECATION")
+                getSystemService(VIBRATOR_SERVICE) as Vibrator
+            }
+            val pattern = if (level == 3) {
+                longArrayOf(0, 850, 160, 850, 160, 1200, 220)
+            } else {
+                longArrayOf(0, 350, 240, 350, 520)
+            }
+            if (Build.VERSION.SDK_INT >= 26) {
+                vibrator.vibrate(VibrationEffect.createWaveform(pattern, 0))
+            } else {
+                @Suppress("DEPRECATION")
+                vibrator.vibrate(pattern, 0)
+            }
+        } catch (_: Exception) {
+        }
+    }
+
+    private fun initializeSpeech() {
+        try { speech?.stop(); speech?.shutdown() } catch (_: Exception) { }
+        speech = TextToSpeech(this) { status ->
+            if (stopped || status != TextToSpeech.SUCCESS) return@TextToSpeech
+            val engine = speech ?: return@TextToSpeech
+            val prefs = getSharedPreferences("separ_prefs", MODE_PRIVATE)
+            val key = if (voiceProfile == "male") "male_voice_name" else "female_voice_name"
+            val selectedName = prefs.getString(key, null)
+            val selectedVoice = engine.voices?.firstOrNull {
+                it.name == selectedName && it.locale.language == "fa"
+            }
+            if (selectedVoice != null) {
+                engine.setVoice(selectedVoice)
+            } else {
+                val languageStatus = engine.setLanguage(Locale("fa", "IR"))
+                if (languageStatus < TextToSpeech.LANG_AVAILABLE) {
+                    updateNotificationSpeechUnavailable()
+                    return@TextToSpeech
+                }
+            }
+            engine.setSpeechRate(0.93f)
+            engine.setPitch(1.0f)
+            engine.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
+                override fun onStart(utteranceId: String?) { }
+                override fun onDone(utteranceId: String?) { }
+                @Deprecated("Deprecated in Java")
+                override fun onError(utteranceId: String?) { }
+            })
+            speakAlert()
+        } 
+    }
+
+    private fun speakAlert() {
+        if (stopped) return
+        try {
+            speech?.speak(message, TextToSpeech.QUEUE_FLUSH, null, "separ-alert-${System.currentTimeMillis()}")
+        } catch (_: Exception) {
+        }
+    }
+
+    private fun updateNotificationSpeechUnavailable() {
+        val manager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        manager.notify(
+            NOTIFICATION_ID,
+            Notification.Builder(this, CHANNEL_ID)
+                .setSmallIcon(android.R.drawable.ic_dialog_alert)
+                .setContentTitle("سپر | موتور گفتار فارسی در دسترس نیست")
+                .setContentText("صدای فارسی برای پروفایل انتخاب‌شده روی این گوشی نصب نیست.")
+                .setCategory(Notification.CATEGORY_ALARM)
+                .setOngoing(true)
+                .build()
+        )
+    }
+
+    private fun levelLabel(value: Int): String = when (value) {
+        1 -> "اطلاع‌رسانی"
+        2 -> "هشدار"
+        else -> "اضطراری"
+    }
+
+    override fun onDestroy() {
+        stopped = true
+        mainHandler.removeCallbacksAndMessages(null)
+        siren.stop()
+        try { speech?.stop(); speech?.shutdown() } catch (_: Exception) { }
         speech = null
         try {
             if (wakeLock?.isHeld == true) wakeLock?.release()
-        } catch (_: Exception) {
-        }
+        } catch (_: Exception) { }
         wakeLock = null
+        try {
+            if (Build.VERSION.SDK_INT >= 31) {
+                (getSystemService(VIBRATOR_MANAGER_SERVICE) as VibratorManager).defaultVibrator.cancel()
+            } else {
+                @Suppress("DEPRECATION")
+                (getSystemService(VIBRATOR_SERVICE) as Vibrator).cancel()
+            }
+        } catch (_: Exception) { }
+        val manager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        manager.cancel(NOTIFICATION_ID)
         super.onDestroy()
     }
 
@@ -133,7 +254,9 @@ class AlertService : Service() {
     companion object {
         const val EXTRA_CITY = "extra_city"
         const val EXTRA_VOICE = "extra_voice"
-        private const val CHANNEL_ID = "separ_alert_channel"
+        const val EXTRA_LEVEL = "extra_level"
+        const val EXTRA_TEST = "extra_test"
+        private const val CHANNEL_ID = "separ_alert_channel_v3"
         private const val NOTIFICATION_ID = 731
     }
 }
