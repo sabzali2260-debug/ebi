@@ -7,9 +7,9 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
 import android.os.Bundle
+import android.provider.Settings
 import android.view.Gravity
 import android.view.View
-import android.view.ViewGroup
 import android.widget.*
 import kotlin.math.cos
 import kotlin.math.min
@@ -18,115 +18,200 @@ import kotlin.math.sin
 class DashboardActivity : Activity() {
     private val prefs by lazy { getSharedPreferences("separ_prefs", MODE_PRIVATE) }
     private val regions = listOf("کل ایران","تهران","البرز","آذربایجان شرقی","آذربایجان غربی","اردبیل","اصفهان","ایلام","بوشهر","چهارمحال و بختیاری","خراسان جنوبی","خراسان رضوی","خراسان شمالی","خوزستان","زنجان","سمنان","سیستان و بلوچستان","فارس","قزوین","قم","کردستان","کرمان","کرمانشاه","کهگیلویه و بویراحمد","گلستان","گیلان","لرستان","مازندران","مرکزی","هرمزگان","همدان","یزد")
-    private val bg = Color.rgb(4, 13, 12)
-    private val panel = Color.rgb(9, 25, 21)
-    private val green = Color.rgb(80, 255, 151)
-    private val dim = Color.rgb(110, 166, 135)
+    private val bg = Color.rgb(3, 10, 12)
+    private val panel = Color.rgb(8, 24, 27)
+    private val green = Color.rgb(89, 255, 166)
+    private val cyan = Color.rgb(76, 220, 230)
+    private val amber = Color.rgb(255, 190, 75)
+    private val red = Color.rgb(255, 82, 82)
+    private val dim = Color.rgb(112, 158, 153)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (!prefs.getBoolean("dashboard_040_migrated", false)) prefs.edit().putInt("siren_volume", 100).putBoolean("dashboard_040_migrated", true).apply()
+        if (!prefs.getBoolean("dashboard_043_migrated", false)) {
+            prefs.edit().putInt("siren_volume", 100).putBoolean("dashboard_043_migrated", true).apply()
+        }
         window.statusBarColor = bg
         window.navigationBarColor = bg
         window.decorView.systemUiVisibility = 0
+
         val scroll = ScrollView(this).apply { setBackgroundColor(bg); isFillViewport = true }
         val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             layoutDirection = View.LAYOUT_DIRECTION_RTL
-            setPadding(dp(14), dp(14), dp(14), dp(26))
+            setPadding(dp(12), dp(14), dp(12), dp(28))
         }
         scroll.addView(root)
         setContentView(scroll)
 
-        root.addView(text("سپر  /  SEPAR", 27, green, true))
-        root.addView(text("سامانه پایش و هشدار منطقه‌ای", 13, dim))
-        root.addView(text("COMMAND • MONITOR • ALERT     /     BUILD 0.4", 10, dim))
+        root.addView(text("سپر  /  SEPAR", 28, green, true))
+        root.addView(text("FLIGHT DECK  •  پنل فرماندهی و پایش", 11, cyan, true))
+        root.addView(text("CONTROL SYSTEM  /  BUILD 0.4.3", 9, dim))
         root.addView(line())
 
         val status = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
+            orientation = LinearLayout.VERTICAL
             setPadding(dp(12), dp(10), dp(12), dp(10))
-            setBackgroundColor(Color.rgb(12, 38, 29))
+            setBackgroundColor(Color.rgb(10, 42, 32))
         }
-        status.addView(text("●", 17, green, true))
-        status.addView(text("  سامانه آماده پایش محلی", 13, green, true), LinearLayout.LayoutParams(0, -2, 1f))
-        status.addView(text("OFFICIAL FEED: NOT CONNECTED", 9, Color.rgb(255,190,75)))
+        status.addView(text("●  SYSTEM READY  /  سامانه آماده", 14, green, true))
+        status.addView(text("منبع هشدار رسمی: متصل نیست  •  رادار: نمایشی  •  حالت: پایش محلی", 10, amber))
         root.addView(status, margin(-1, -2, 0, 12))
 
-        val radarCard = card(root, "رادار منطقه‌ای  /  LOCAL RADAR")
-        val radar = RadarView(this).apply { setBackgroundColor(Color.rgb(2, 15, 11)) }
-        radarCard.addView(radar, LinearLayout.LayoutParams(-1, dp(270)))
-        radarCard.addView(text("نمایشگر جاروب راداری گرافیکی است؛ کشف واقعی هدف یا ردیابی هواگرد انجام نمی‌دهد.", 11, dim))
+        val instruments = GridLayout(this).apply {
+            columnCount = 2
+            rowCount = 2
+            setBackgroundColor(bg)
+        }
+        instrument(instruments, "RADAR SWEEP", "جاروب گرافیکی فعال", green)
+        instrument(instruments, "ALERT CHANNEL", "آمادهٔ آزمایش محلی", cyan)
+        instrument(instruments, "AUDIO SYSTEM", "آژیر و گفتار داخلی", amber)
+        instrument(instruments, "DATA LINK", "بدون خوراک رسمی زنده", red)
+        root.addView(instruments, margin(-1, -2, 0, 12))
 
-        val areaCard = card(root, "انتخاب محدوده پایش")
-        areaCard.addView(text("استان یا محدوده‌ای را که می‌خواهی وضعیت هشدار آن را دنبال کنی انتخاب کن.", 12, dim))
+        val radarCard = card(root, "01  /  RADAR DISPLAY  •  رادار منطقه‌ای")
+        val radar = RadarView(this).apply { setBackgroundColor(Color.rgb(1, 13, 14)) }
+        radarCard.addView(radar, LinearLayout.LayoutParams(-1, dp(230)))
+        radarCard.addView(text("این نمایشگر فقط جاروب گرافیکی است؛ کشف هدف، رهگیری هواگرد یا تشخیص حمله انجام نمی‌دهد.", 10, amber))
+
+        val quick = card(root, "02  /  FLIGHT DECK KEYS  •  کلیدهای سریع")
+        val keys = GridLayout(this).apply {
+            columnCount = 2
+            useDefaultMargins = false
+        }
+        key(keys, "◉  نقشه ایران", cyan) { openActivity(IranMapActivity::class.java) }
+        key(keys, "⌁  منابع هوانوردی", green) { openActivity(AirspaceReferenceActivity::class.java) }
+        key(keys, "♫  تست آژیر", amber) { launch(2) }
+        key(keys, "◖  تست پیام صوتی", cyan) { launch(1) }
+        key(keys, "▲  هشدار سطح ۲", amber) { launch(2) }
+        key(keys, "▲▲  اضطراری سطح ۳", red) { launch(3) }
+        key(keys, "■  توقف فوری", Color.WHITE) { stopAlert() }
+        key(keys, "⚙  تنظیمات دستگاه", green) { openNotificationSettings() }
+        quick.addView(keys, LinearLayout.LayoutParams(-1, -2))
+
+        val area = card(root, "03  /  AREA SELECTOR  •  انتخاب منطقه")
+        area.addView(text("محدودهٔ انتخابی برای آزمایش و نمایش هشدار", 11, dim))
         val picker = Spinner(this).apply {
             adapter = ArrayAdapter(this@DashboardActivity, android.R.layout.simple_spinner_dropdown_item, regions)
             setSelection(regions.indexOf(prefs.getString("selected_city", "کل ایران")).coerceAtLeast(0))
         }
-        areaCard.addView(picker, LinearLayout.LayoutParams(-1, dp(52)))
-        picker.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
+        area.addView(picker, LinearLayout.LayoutParams(-1, dp(50)))
+        picker.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: View?, position: Int, id: Long) {
                 prefs.edit().putString("selected_city", regions[position]).apply()
             }
-            override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {}
+            override fun onNothingSelected(parent: android.widget.AdapterView<*>?) = Unit
         }
 
-        val alertCard = card(root, "پنل هشدار اضطراری")
-        alertCard.addView(text("دکمه‌ها فقط برای آزمایش محلی صدا و صفحه هشدار هستند؛ هشدار واقعی از منبع رسمی دریافت نمی‌شود.", 11, dim))
-        addAction(alertCard, "آزمایش سطح ۱  /  اطلاع‌رسانی", green) { launch(1) }
-        addAction(alertCard, "آزمایش سطح ۲  /  هشدار", Color.rgb(255,190,65)) { launch(2) }
-        addAction(alertCard, "آزمایش سطح ۳  /  وضعیت اضطراری", Color.rgb(255,75,65)) { launch(3) }
-        addAction(alertCard, "توقف فوری آژیر و لرزش", Color.WHITE) {
-            stopService(Intent(this, AlertService::class.java))
-        }
+        val alert = card(root, "04  /  ALERT PANEL  •  پنل سه سطح هشدار")
+        alert.addView(text("این کلیدها برای آزمایش محلی هستند و هشدار واقعی دریافت نمی‌کنند.", 10, amber))
+        addAction(alert, "LEVEL 1  /  اطلاع‌رسانی و پیام صوتی", green) { launch(1) }
+        addAction(alert, "LEVEL 2  /  هشدار + آژیر + لرزش", amber) { launch(2) }
+        addAction(alert, "LEVEL 3  /  اضطراری + تکرار پیام", red) { launch(3) }
+        addAction(alert, "EMERGENCY CUT-OFF  /  توقف همه هشدارها", Color.WHITE) { stopAlert() }
 
-        val settings = card(root, "تنظیمات عملیاتی")
-        addToggle(settings, "چشمک قرمز صفحه در هشدار", "screen_flash", true)
-        addToggle(settings, "لرزش هشدار", "vibration", true)
-        addToggle(settings, "تکرار پیام صوتی سطح اضطراری", "repeat_speech", true)
-        addToggle(settings, "فعال بودن هشدارهای سطح ۱", "allow_level_1", true)
-        settings.addView(text("صدای گویای هشدار (بدون نیاز به نصب روی گوشی)", 12, green, true))
+        val controls = card(root, "05  /  SYSTEM CONFIG  •  تنظیمات سامانه")
+        addToggle(controls, "چراغ چشمک‌زن قرمز هنگام هشدار", "screen_flash", true)
+        addToggle(controls, "لرزش الگوی اضطراری", "vibration", true)
+        addToggle(controls, "تکرار پیام گفتاری در سطح ۳", "repeat_speech", true)
+
+        controls.addView(text("حداقل سطح اعلان خودکار (در صورت اتصال منبع معتبر)", 11, cyan, true))
+        val levelPicker = Spinner(this).apply {
+            adapter = ArrayAdapter(this@DashboardActivity, android.R.layout.simple_spinner_dropdown_item,
+                listOf("سطح ۱، ۲ و ۳", "فقط سطح ۲ و ۳", "فقط سطح ۳"))
+            setSelection((prefs.getInt("minimum_level", 1) - 1).coerceIn(0, 2))
+        }
+        levelPicker.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: View?, position: Int, id: Long) {
+                prefs.edit().putInt("minimum_level", position + 1).apply()
+            }
+            override fun onNothingSelected(parent: android.widget.AdapterView<*>?) = Unit
+        }
+        controls.addView(levelPicker, LinearLayout.LayoutParams(-1, dp(48)))
+
+        controls.addView(text("پروفایل گویندهٔ فارسی آفلاین", 11, cyan, true))
         val voicePicker = Spinner(this).apply {
-            adapter = ArrayAdapter(this@DashboardActivity, android.R.layout.simple_spinner_dropdown_item, listOf("صدای بم", "صدای زیر"))
+            adapter = ArrayAdapter(this@DashboardActivity, android.R.layout.simple_spinner_dropdown_item,
+                listOf("صدای بم / پروفایل مردانه", "صدای زیر / پروفایل زنانه"))
             setSelection(if (prefs.getString("preferred_voice", "female") == "male") 0 else 1)
         }
         voicePicker.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: View?, position: Int, id: Long) {
                 prefs.edit().putString("preferred_voice", if (position == 0) "male" else "female").apply()
             }
-            override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {}
+            override fun onNothingSelected(parent: android.widget.AdapterView<*>?) = Unit
         }
-        settings.addView(voicePicker, LinearLayout.LayoutParams(-1, dp(48)))
-        settings.addView(text("هر دو پیام صوتی فارسی داخل برنامه بسته‌بندی می‌شوند و آفلاین پخش می‌شوند. این دو پروفایل صدای مصنوعی با زیر و بمی متفاوت‌اند، نه ضبط انسانی.", 10, dim))
-        settings.addView(text("شدت آژیر  •  صدای خروجی گوشی نیز باید بالا باشد", 12, green, true))
-        val volumeLabel = text("", 11, dim)
+        controls.addView(voicePicker, LinearLayout.LayoutParams(-1, dp(48)))
+        controls.addView(text("دو پروفایل گفتار مصنوعی فارسی داخل برنامه قرار دارند و به صدای نصب‌شده روی گوشی وابسته نیستند.", 10, dim))
+
+        controls.addView(text("SIREN MASTER VOLUME  •  شدت آژیر", 11, cyan, true))
+        val volumeLabel = text("", 11, green)
         val volume = SeekBar(this).apply {
             max = 100
-            progress = prefs.getInt("siren_volume", 100).coerceIn(30,100)
+            progress = prefs.getInt("siren_volume", 100).coerceIn(10, 100)
         }
         fun updateVolume(v: Int) {
-            prefs.edit().putInt("siren_volume", v.coerceIn(30,100)).apply()
-            volumeLabel.text = "شدت انتخاب‌شده: ${v.coerceIn(30,100)}٪"
+            val value = v.coerceIn(10, 100)
+            prefs.edit().putInt("siren_volume", value).apply()
+            volumeLabel.text = "خروجی آژیر: $value٪"
         }
         updateVolume(volume.progress)
         volume.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) = updateVolume(progress)
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStartTrackingTouch(seekBar: SeekBar?) = Unit
+            override fun onStopTrackingTouch(seekBar: SeekBar?) = Unit
         })
-        settings.addView(volumeLabel)
-        settings.addView(volume, LinearLayout.LayoutParams(-1, dp(48)))
-        settings.addView(text("نوع آژیر: هشدار ممتد موجی با تغییر زیر و بمی و الگوی تکرارشونده؛ صدای داخل برنامه تولید می‌شود و به فایل صوتی گوشی وابسته نیست.", 11, dim))
+        controls.addView(volumeLabel)
+        controls.addView(volume, LinearLayout.LayoutParams(-1, dp(48)))
 
-        val sources = card(root, "منابع و اعتبار هشدار")
+        val support = card(root, "06  /  SYSTEM ACCESS  •  دسترسی‌های دستگاه")
+        addAction(support, "بازکردن تنظیمات اعلان‌های سپر", cyan) { openNotificationSettings() }
+        addAction(support, "تنظیمات نمایش تمام‌صفحه روی قفل", green) { openFullScreenSettings() }
+        addAction(support, "بازکردن صفحه تنظیمات پیشرفته", amber) { openActivity(MainActivity::class.java) }
+
+        val sources = card(root, "07  /  DATA SOURCES  •  منابع اطلاعات")
         addAction(sources, "Iran AIM  •  مرجع رسمی اطلاعات هوانوردی", green) { open("https://ais.airport.ir") }
         addAction(sources, "EASA  •  بولتن‌های ایمنی هوانوردی", green) { open("https://www.easa.europa.eu/en/domains/air-operations/czibs") }
         addAction(sources, "Flightradar24  •  مشاهده دستی پروازها", green) { open("https://www.flightradar24.com/") }
-        sources.addView(text("در این نسخه هنوز خوراک ماشینی معتبر و تأییدشده برای هشدار خودکار ایران متصل نیست. مشاهده پروازها یا انیمیشن رادار به معنی کشف تهدید نیست. تا اتصال منبع رسمی، برنامه را ابزار کمکی بدان نه سامانه تضمین‌کننده ایمنی.", 11, Color.rgb(255,190,75)))
+        sources.addView(text("در این نسخه خوراک ماشینی معتبر و تأییدشده برای هشدار خودکار ایران متصل نیست. انیمیشن رادار یا مشاهده پروازها، کشف تهدید محسوب نمی‌شود. برای تصمیم ایمنی فقط اطلاعیه‌های رسمی را بررسی کن.", 10, amber))
 
-        root.addView(text("SEPAR • CONTROL PANEL • 0.4.0", 10, dim))
+        root.addView(text("SEPAR FLIGHT DECK  •  VERSION 0.4.3", 9, dim))
+    }
+
+    private fun instrument(parent: GridLayout, heading: String, value: String, color: Int) {
+        val box = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(10), dp(9), dp(10), dp(9))
+            setBackgroundColor(panel)
+        }
+        box.addView(text(heading, 9, dim, true))
+        box.addView(text(value, 11, color, true))
+        val params = GridLayout.LayoutParams().apply {
+            width = 0
+            height = dp(62)
+            columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
+            setMargins(dp(3), dp(3), dp(3), dp(3))
+        }
+        parent.addView(box, params)
+    }
+
+    private fun key(parent: GridLayout, title: String, color: Int, action: () -> Unit) {
+        val b = Button(this).apply {
+            text = title
+            textSize = 11f
+            setTextColor(color)
+            setBackgroundColor(Color.rgb(14, 43, 43))
+            isAllCaps = false
+            minHeight = dp(54)
+            setOnClickListener { action() }
+        }
+        val params = GridLayout.LayoutParams().apply {
+            width = 0
+            height = dp(58)
+            columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
+            setMargins(dp(3), dp(3), dp(3), dp(3))
+        }
+        parent.addView(b, params)
     }
 
     private fun launch(level: Int) {
@@ -137,40 +222,49 @@ class DashboardActivity : Activity() {
             .putExtra(AlertService.EXTRA_CITY, city)
             .putExtra(AlertService.EXTRA_VOICE, voice)
             .putExtra(AlertService.EXTRA_TEST, true)
-        if (android.os.Build.VERSION.SDK_INT >= 26) startForegroundService(i) else startService(i)
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= 26) startForegroundService(i) else startService(i)
+        } catch (_: Exception) {
+            Toast.makeText(this, "شروع هشدار آزمایشی ممکن نشد؛ مجوز اعلان را بررسی کن.", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun stopAlert() {
+        stopService(Intent(this, AlertService::class.java))
+        Toast.makeText(this, "فرمان توقف ارسال شد", Toast.LENGTH_SHORT).show()
     }
 
     private fun addToggle(parent: LinearLayout, title: String, key: String, default: Boolean) {
         parent.addView(Switch(this).apply {
             text = title
             setTextColor(green)
-            textSize = 13f
+            textSize = 12f
             isChecked = prefs.getBoolean(key, default)
             setOnCheckedChangeListener { _, checked -> prefs.edit().putBoolean(key, checked).apply() }
-        }, LinearLayout.LayoutParams(-1, dp(48)))
+        }, LinearLayout.LayoutParams(-1, dp(46)))
     }
 
     private fun card(root: LinearLayout, heading: String): LinearLayout {
         val box = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(dp(13), dp(13), dp(13), dp(13))
+            setPadding(dp(12), dp(12), dp(12), dp(12))
             setBackgroundColor(panel)
         }
-        box.addView(text(heading, 14, green, true))
-        root.addView(box, margin(-1, -2, 0, 12))
+        box.addView(text(heading, 13, green, true))
+        root.addView(box, margin(-1, -2, 0, 10))
         return box
     }
 
     private fun addAction(parent: LinearLayout, title: String, color: Int, action: () -> Unit) {
         val b = Button(this).apply {
             text = title
-            textSize = 12f
+            textSize = 11f
             setTextColor(color)
-            setBackgroundColor(Color.rgb(19, 42, 32))
+            setBackgroundColor(Color.rgb(16, 42, 42))
             isAllCaps = false
             setOnClickListener { action() }
         }
-        parent.addView(b, LinearLayout.LayoutParams(-1, dp(48)).apply { topMargin = dp(5) })
+        parent.addView(b, LinearLayout.LayoutParams(-1, dp(46)).apply { topMargin = dp(4) })
     }
 
     private fun text(value: String, size: Int, color: Int, bold: Boolean = false) =
@@ -183,8 +277,8 @@ class DashboardActivity : Activity() {
         }
 
     private fun line(): View = View(this).apply {
-        setBackgroundColor(Color.rgb(30, 83, 57))
-        layoutParams = LinearLayout.LayoutParams(-1, dp(1)).apply { topMargin = dp(10); bottomMargin = dp(12) }
+        setBackgroundColor(Color.rgb(30, 92, 72))
+        layoutParams = LinearLayout.LayoutParams(-1, dp(1)).apply { topMargin = dp(9); bottomMargin = dp(12) }
     }
 
     private fun margin(w: Int, h: Int, top: Int, bottom: Int) =
@@ -192,9 +286,28 @@ class DashboardActivity : Activity() {
 
     private fun dp(v: Int) = (v * resources.displayMetrics.density).toInt()
 
+    private fun openActivity(clazz: Class<out Activity>) {
+        try { startActivity(Intent(this, clazz)) }
+        catch (_: Exception) { Toast.makeText(this, "این بخش باز نشد", Toast.LENGTH_SHORT).show() }
+    }
+
     private fun open(url: String) {
         try { startActivity(Intent(Intent.ACTION_VIEW, android.net.Uri.parse(url))) }
         catch (_: Exception) { Toast.makeText(this, "مرورگر در دسترس نیست", Toast.LENGTH_SHORT).show() }
+    }
+
+    private fun openNotificationSettings() {
+        try {
+            startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, packageName))
+        } catch (_: Exception) { Toast.makeText(this, "تنظیمات اعلان باز نشد", Toast.LENGTH_SHORT).show() }
+    }
+
+    private fun openFullScreenSettings() {
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= 34) {
+                startActivity(Intent(Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT).putExtra(Settings.EXTRA_APP_PACKAGE, packageName))
+            } else openNotificationSettings()
+        } catch (_: Exception) { openNotificationSettings() }
     }
 
     inner class RadarView(context: android.content.Context) : View(context) {
@@ -217,12 +330,11 @@ class DashboardActivity : Activity() {
             p.color = Color.argb(55, 70, 255, 135)
             val sweep = RectF(cx-radius, cy-radius, cx+radius, cy+radius)
             canvas.drawArc(sweep, angle.toFloat()-32f, 32f, true, p)
-            p.color = Color.rgb(100,255,150)
+            p.color = green
             p.strokeWidth = dp(2).toFloat()
             val rad = Math.toRadians(angle)
             canvas.drawLine(cx, cy, cx + cos(rad).toFloat()*radius, cy + sin(rad).toFloat()*radius, p)
             p.style = Paint.Style.FILL
-            p.color = green
             canvas.drawCircle(cx, cy, dp(4).toFloat(), p)
             p.textSize = dp(10).toFloat()
             p.color = dim
