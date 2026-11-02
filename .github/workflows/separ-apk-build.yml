@@ -45,12 +45,19 @@ jobs:
         with:
           gradle-version: "8.11.1"
 
+      - name: Add supplied air-raid siren audio
+        run: |
+          mkdir -p separ-app/app/src/main/assets
+          curl --fail --location --silent --show-error 'https://sdmntprnortheu.oaiusercontent.com/files/00000000-1af0-81f4-a3e7-601621b147ab/raw?se=2026-11-02T01%3A09%3A56Z&sp=r&sv=2026-02-06&sr=b&scid=4fd3093c-465b-5615-b61c-ec2c615ab73c&skoid=1d6acb5b-b3f4-43ec-a5ec-b05c4a7708c8&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-11-01T22%3A54%3A00Z&ske=2026-11-02T22%3A54%3A00Z&sks=b&skv=2026-02-06&sig=92yVAn0WTGVX1D7aWk2v9jQRabd2Kc8lI2XgJcQXFe0%3D' -o separ-app/app/src/main/assets/air_raid_siren.mp3
+          test -s separ-app/app/src/main/assets/air_raid_siren.mp3
+          file separ-app/app/src/main/assets/air_raid_siren.mp3
+
       - name: Generate bundled offline Persian alert voices
         run: |
           sudo apt-get update
           sudo apt-get install -y espeak espeak-data ffmpeg
           mkdir -p separ-app/app/src/main/assets
-          printf 'توجه! هشدار حمله هوایی. فوراً به محل امن پناه ببرید.\n' > /tmp/separ-alert-fa.txt
+          printf 'توجه! هشدار حمله هوایی. فوراً به محل امن پناه ببرید.\\n' > /tmp/separ-alert-fa.txt
           espeak -v fa -s 170 -p 28 -a 190 -f /tmp/separ-alert-fa.txt -w /tmp/separ-male.wav
           espeak -v fa -s 170 -p 65 -a 190 -f /tmp/separ-alert-fa.txt -w /tmp/separ-female.wav
           ffmpeg -y -i /tmp/separ-male.wav -ac 1 -ar 16000 -c:a libmp3lame -b:a 24k separ-app/app/src/main/assets/voice_male.mp3
