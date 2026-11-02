@@ -8,46 +8,28 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
-
     <queries>
-        <intent>
-            <action android:name="android.intent.action.TTS_SERVICE" />
-        </intent>
+        <intent><action android:name="android.intent.action.TTS_SERVICE" /></intent>
     </queries>
-
     <application
         android:allowBackup="false"
         android:icon="@android:drawable/ic_dialog_alert"
         android:label="سپر | SEPAR"
         android:supportsRtl="true"
         android:usesCleartextTraffic="false"
-        android:theme="@android:style/Theme.Material.Light.NoActionBar">
-        <activity
-            android:name=".AlertActivity"
-            android:exported="false"
-            android:showWhenLocked="true"
-            android:turnScreenOn="true"
-            android:excludeFromRecents="true" />
-        <activity
-            android:name=".IranMapActivity"
-            android:exported="false" />
-        <activity
-            android:name=".AirspaceReferenceActivity"
-            android:exported="false" />
-        <activity
-            android:name=".MainActivity"
-            android:exported="true">
+        android:theme="@android:style/Theme.Material.NoActionBar">
+        <activity android:name=".AlertActivity" android:exported="false"
+            android:showWhenLocked="true" android:turnScreenOn="true" android:excludeFromRecents="true" />
+        <activity android:name=".IranMapActivity" android:exported="false" />
+        <activity android:name=".AirspaceReferenceActivity" android:exported="false" />
+        <activity android:name=".MainActivity" android:exported="false" />
+        <activity android:name=".DashboardActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service
-            android:name=".AlertService"
-            android:exported="false"
-            android:foregroundServiceType="mediaPlayback" />
-        <receiver
-            android:name=".StopAlertReceiver"
-            android:exported="false" />
+        <service android:name=".AlertService" android:exported="false" android:foregroundServiceType="mediaPlayback" />
+        <receiver android:name=".StopAlertReceiver" android:exported="false" />
     </application>
 </manifest>
