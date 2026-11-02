@@ -4,8 +4,10 @@ import android.app.Activity
 import android.graphics.Color
 import android.os.Bundle
 import android.view.Gravity
+import android.content.Intent
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.Button
 import android.widget.TextView
 import org.maplibre.android.MapLibre
 import org.maplibre.android.camera.CameraPosition
@@ -70,8 +72,17 @@ class IranMapActivity : Activity() {
         root.addView(mapView, LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f
         ))
+        root.addView(Button(this).apply {
+            text = "نمایش لایه‌های محدودیت و NOTAM (مرجع ثانویه)"
+            isAllCaps = false
+            setOnClickListener {
+                startActivity(Intent(this@IranMapActivity, AirspaceReferenceActivity::class.java))
+            }
+        }, LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+        ))
         root.addView(TextView(this).apply {
-            text = "نقاط شهرها برای جهت‌یابی‌اند؛ مرز رسمی FIR و مناطق NOTAM هنوز به‌صورت خودکار به این نقشه متصل نشده‌اند. نقشه با اینترنت بارگذاری می‌شود."
+            text = "نقاط شهرها برای جهت‌یابی‌اند؛ نقشهٔ پایه از OpenFreeMap / OpenStreetMap است. مرز رسمی FIR و مناطق NOTAM هنوز به‌صورت خودکار روی این نقشه متصل نشده‌اند. لایهٔ NOTAM در صفحهٔ مرجع ثانویه، حکم تأیید رسمی ندارد."
             textSize = 12f
             setTextColor(Color.DKGRAY)
             setPadding(14, 10, 14, 10)
