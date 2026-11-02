@@ -73,7 +73,7 @@ class AlertService : Service() {
 
         if (level >= 2) {
             val volume = getSharedPreferences("separ_prefs", MODE_PRIVATE)
-                .getInt("siren_volume", 82).coerceIn(10, 100) / 100f
+                .getInt("siren_volume", 100).coerceIn(10, 100) / 100f
             siren.start(if (level == 3) (volume * 1.08f).coerceAtMost(1.0f) else volume)
             startVibration()
         }
