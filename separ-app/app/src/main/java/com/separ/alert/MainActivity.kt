@@ -282,7 +282,21 @@ class MainActivity : Activity() {
         val femaleSaved = prefs.getString("female_voice_name", null)
         maleVoicePicker.setSelection(persianVoices.indexOfFirst { it.name == maleSaved }.coerceAtLeast(0))
         femaleVoicePicker.setSelection(persianVoices.indexOfFirst { it.name == femaleSaved }.coerceAtLeast(0))
-        voiceStatus.text = "تعداد صداهای فارسی نصب‌شده: ${persianVoices.size}. برای تشخیص واقعی، هر دو نمونه را پخش و پروفایل مناسب را انتخاب کن."
+        voiceStatus.text = "تعداد صداهای فارسی نصب‌شده: ${persianVoices.size}. نمونه‌ها را گوش کن و پروفایل مناسب را تعیین کن."
+        val voiceSelectionListener = object : android.widget.AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: View?, position: Int, id: Long) {
+                saveVoiceAssignments()
+                val same = maleVoicePicker.selectedItemPosition == femaleVoicePicker.selectedItemPosition
+                if (same) {
+                    voiceStatus.text = "هر دو پروفایل روی یک صدای فارسی تنظیم شده‌اند؛ برای صدای متفاوت، یک صدای دیگر انتخاب کن."
+                } else {
+                    voiceStatus.text = "دو صدای فارسی جدا انتخاب شده‌اند. با دکمه‌های آزمایش، جنسیت و تلفظ هر صدا را بررسی کن."
+                }
+            }
+            override fun onNothingSelected(parent: android.widget.AdapterView<*>?) = Unit
+        }
+        maleVoicePicker.onItemSelectedListener = voiceSelectionListener
+        femaleVoicePicker.onItemSelectedListener = voiceSelectionListener
         saveVoiceAssignments()
     }
 
