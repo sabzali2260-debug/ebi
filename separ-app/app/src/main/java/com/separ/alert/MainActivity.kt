@@ -40,14 +40,14 @@ class MainActivity : Activity() {
 
     private val navy = Color.rgb(19, 43, 68)
     private val muted = Color.rgb(89, 105, 122)
-    private val background = Color.rgb(244, 247, 250)
+    private val pageBackgroundColor = Color.rgb(244, 247, 250)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestNotificationPermission()
 
         val scroll = ScrollView(this).apply {
-            setBackgroundColor(background)
+            setBackgroundColor(this@MainActivity.pageBackgroundColor)
             isFillViewport = true
         }
         val root = LinearLayout(this).apply {
