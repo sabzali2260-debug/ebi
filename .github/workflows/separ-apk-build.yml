@@ -9,6 +9,10 @@ on:
       - ".github/workflows/separ-apk-build.yml"
   workflow_dispatch:
 
+concurrency:
+  group: separ-apk-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
