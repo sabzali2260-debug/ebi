@@ -45,6 +45,19 @@ jobs:
         with:
           gradle-version: "8.11.1"
 
+      - name: Generate bundled offline Persian alert voices
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y espeak espeak-data ffmpeg
+          mkdir -p separ-app/app/src/main/assets
+          printf 'توجه! هشدار حمله هوایی. فوراً به محل امن پناه ببرید.\n' > /tmp/separ-alert-fa.txt
+          espeak -v fa -s 170 -p 28 -a 190 -f /tmp/separ-alert-fa.txt -w /tmp/separ-male.wav
+          espeak -v fa -s 170 -p 65 -a 190 -f /tmp/separ-alert-fa.txt -w /tmp/separ-female.wav
+          ffmpeg -y -i /tmp/separ-male.wav -ac 1 -ar 16000 -c:a libmp3lame -b:a 24k separ-app/app/src/main/assets/voice_male.mp3
+          ffmpeg -y -i /tmp/separ-female.wav -ac 1 -ar 16000 -c:a libmp3lame -b:a 24k separ-app/app/src/main/assets/voice_female.mp3
+          test -s separ-app/app/src/main/assets/voice_male.mp3
+          test -s separ-app/app/src/main/assets/voice_female.mp3
+
       - name: Run airspace policy unit tests
         run: gradle --no-daemon --stacktrace -p separ-app :app:testDebugUnitTest
 
