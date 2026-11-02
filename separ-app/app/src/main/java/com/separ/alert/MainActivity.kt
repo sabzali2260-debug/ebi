@@ -175,6 +175,27 @@ class MainActivity : Activity() {
         ))
         voiceStatus = label("در حال بررسی موتور گفتار فارسی…", 13, muted)
         voiceCard.addView(voiceStatus)
+        voiceCard.addView(label("گویندهٔ فعال برای هشدارها", 14, navy, true))
+        val activeVoice = RadioGroup(this).apply {
+            orientation = RadioGroup.HORIZONTAL
+            layoutDirection = View.LAYOUT_DIRECTION_RTL
+        }
+        val maleProfile = RadioButton(this).apply {
+            id = 2101
+            text = "مردانه"
+            isChecked = (prefs.getString("preferred_voice", "female") == "male")
+        }
+        val femaleProfile = RadioButton(this).apply {
+            id = 2102
+            text = "زنانه"
+            isChecked = !maleProfile.isChecked
+        }
+        activeVoice.addView(maleProfile)
+        activeVoice.addView(femaleProfile)
+        activeVoice.setOnCheckedChangeListener { _, checkedId ->
+            prefs.edit().putString("preferred_voice", if (checkedId == maleProfile.id) "male" else "female").apply()
+        }
+        voiceCard.addView(activeVoice)
         voiceCard.addView(label("صدای پروفایل مردانه", 14, navy, true))
         maleVoicePicker = Spinner(this)
         voiceCard.addView(maleVoicePicker, matchWidth())
