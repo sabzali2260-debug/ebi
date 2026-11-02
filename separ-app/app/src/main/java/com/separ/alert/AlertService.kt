@@ -66,7 +66,9 @@ class AlertService : Service() {
         acquireWakeLock()
 
         if (level >= 2) {
-            siren.start(if (level == 3) 0.95f else 0.78f)
+            val volume = getSharedPreferences("separ_prefs", MODE_PRIVATE)
+                .getInt("siren_volume", 82).coerceIn(10, 100) / 100f
+            siren.start(if (level == 3) (volume * 1.08f).coerceAtMost(1.0f) else volume)
             startVibration()
         }
         initializeSpeech()
@@ -192,7 +194,8 @@ class AlertService : Service() {
                     return@TextToSpeech
                 }
             }
-            engine.setSpeechRate(0.93f)
+            val speechRate = prefs.getInt("speech_rate", 93).coerceIn(75, 115) / 100f
+            engine.setSpeechRate(speechRate)
             engine.setPitch(1.0f)
             engine.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                 override fun onStart(utteranceId: String?) { }
